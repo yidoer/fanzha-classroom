@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "packVersion": 1,
+  "minAppVersionCode": 1,
+  "downloadUrl": "https://github.com/OWNER/REPOSITORY/releases/download/stories-v1/story-pack.json",
+  "sha256": "REPLACE_AFTER_FIRST_RELEASE",
+  "changelog": "首个公开剧情包。"
+  ,"latestAppVersionCode": 2
+  ,"latestAppVersionName": "0.2.0"
+  ,"apkUrl": "https://github.com/OWNER/REPOSITORY/releases/download/app-v0.2.0/app-release.apk"
+  ,"apkSha256": "REPLACE_AFTER_APP_RELEASE"
+  ,"appChangelog": "Material 3 界面、十节点真假混合故事、应用内更新与剧情回退。"
+}

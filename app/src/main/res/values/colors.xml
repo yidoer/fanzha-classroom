@@ -1,0 +1,15 @@
+<resources>
+    <!-- Anti-fraud "Truth Journal" palette -->
+    <color name="brand_red">#9B1B30</color>
+    <color name="brand_red_dark">#6B121E</color>
+    <color name="warning">#D4A017</color>
+    <color name="success">#2D6A4F</color>
+    <color name="accent">#1E2A4F</color>
+    <color name="accent_container">#E8ECF4</color>
+    <color name="ink">#1B1B1B</color>
+    <color name="muted">#5C5C5C</color>
+    <color name="line">#D9D3C8</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F5F1EB</color>
+    <color name="background">#FBF7F0</color>
+</resources>

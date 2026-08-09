@@ -1,0 +1,12 @@
+.gradle/
+build/
+*.apk
+local.properties
+.idea/
+*.iml
+'app/build/'
+'app/release/'
+'build/'
+'*.apk'
+'!releases/*.apk'
+'!fanzha-classroom-*.apk'

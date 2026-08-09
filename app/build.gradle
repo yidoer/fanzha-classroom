@@ -1,0 +1,40 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'cn.fanzha.classroom'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'cn.fanzha.classroom'
+        minSdk 23
+        targetSdk 35
+        versionCode 4
+        versionName '0.4.0'
+        def storyManifestUrl = project.findProperty('STORY_MANIFEST_URL') ?: ''
+        buildConfigField 'String', 'STORY_MANIFEST_URL', '"' + storyManifestUrl + '"'
+        def storyFallbackUrl = project.findProperty('STORY_FALLBACK_MANIFEST_URL') ?: ''
+        buildConfigField 'String', 'STORY_FALLBACK_MANIFEST_URL', '"' + storyFallbackUrl + '"'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+}
