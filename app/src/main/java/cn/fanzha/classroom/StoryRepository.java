@@ -12,6 +12,7 @@ import java.util.Map;
 
 public final class StoryRepository {
     private StoryRepository(){}
+
     public static Map<String,StoryScript> load(Context context){
         Map<String,StoryScript> result=new LinkedHashMap<>();
         try(BufferedReader reader=new BufferedReader(new InputStreamReader(context.getAssets().open("interactive_stories.json")))){
@@ -21,5 +22,17 @@ public final class StoryRepository {
         }catch(Exception e){throw new IllegalStateException("互动剧情加载失败",e);}
         return result;
     }
-    public static List<FraudCase> playableCases(Context context,List<FraudCase> cases){Map<String,StoryScript> scripts=load(context);List<FraudCase> result=new ArrayList<>();for(FraudCase item:cases)if(scripts.containsKey(item.id))result.add(item);return result;}
+
+    /** Only cases with a matching script are playable; the script also supplies the shelf copy. */
+    public static List<FraudCase> playableCases(Context context,List<FraudCase> cases){
+        Map<String,StoryScript> scripts=load(context);
+        List<FraudCase> result=new ArrayList<>();
+        for(FraudCase item:cases){
+            StoryScript script=scripts.get(item.id);
+            if(script==null)continue;
+            item.attachScript(script);
+            result.add(item);
+        }
+        return result;
+    }
 }

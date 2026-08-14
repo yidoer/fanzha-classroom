@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">防诈课堂</string>
+    <string name="header_subtitle">真假不预告，练习有边界的信任</string>
+    <string name="search_hint">搜索故事、人物或情境</string>
+    <string name="update_center">更新中心</string>
+    <string name="nav_stories">故事</string>
+    <string name="nav_favorites">收藏</string>
+    <string name="nav_emergency">止损</string>
+    <string name="badge_cleared">已通关</string>
+    <string name="favorite_story">收藏故事</string>
+    <string name="story_back">返回</string>
+    <string name="story_back_glyph">&#8249;</string>
+    <string name="story_jump">进度跳转</string>
+    <string name="story_prompt_default">你会怎么做？</string>
+    <string name="story_continue">继续</string>
+    <string name="story_stage_fmt">第 %1$d 节 · %2$s  ·  预计还有 %3$d 步</string>
+    <string name="story_stage_ending_fmt">结局 · %1$d 步走完</string>
+    <string name="story_status_fmt">关系 %1$d  ·  证据 %2$d  ·  暴露 %3$d  ·  ¥%4$d</string>
+    <string name="story_source_fmt">素材性质：%1$s\n参考来源：%2$s · %3$s</string>
+    <string name="stat_chip_fmt">%1$s %2$d</string>
+    <string name="empty_favorites">还没有收藏任何故事\n去「故事」页挑一篇开始吧</string>
+    <string name="empty_search_fmt">没有找到与「%1$s」相关的故事</string>
+    <string name="empty_category">这个分类下暂时没有可阅读的故事</string>
+</resources>

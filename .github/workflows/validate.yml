@@ -8,8 +8,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Validate story pack
+      - name: Validate case pack
         run: node tools/validate_story_pack.js
+      - name: Validate interactive stories
+        run: node tools/validate_interactive_stories.js
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

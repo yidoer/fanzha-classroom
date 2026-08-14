@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 4dp 递进间距刻度 -->
+    <dimen name="space_1">4dp</dimen>
+    <dimen name="space_2">8dp</dimen>
+    <dimen name="space_3">12dp</dimen>
+    <dimen name="space_4">16dp</dimen>
+    <dimen name="space_5">20dp</dimen>
+
+    <!-- 圆角层级 -->
+    <dimen name="radius_chip">8dp</dimen>
+    <dimen name="radius_card">8dp</dimen>
+    <dimen name="radius_input">8dp</dimen>
+
+    <!-- 触控尺寸：Material 最小 48dp -->
+    <dimen name="touch_min">48dp</dimen>
+    <dimen name="nav_bar_height">60dp</dimen>
+    <dimen name="search_height">48dp</dimen>
+</resources>

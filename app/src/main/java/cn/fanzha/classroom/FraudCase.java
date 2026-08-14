@@ -2,6 +2,7 @@ package cn.fanzha.classroom;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.util.Locale;
 
 public class FraudCase {
     public final String id;
@@ -17,6 +18,9 @@ public class FraudCase {
     public final String sourceDate;
     public final String sourceUrl;
     public final boolean isScam;
+
+    /** Attached at load time so the shelf can show what the story itself declares. */
+    private StoryScript script;
 
     private FraudCase(JSONObject json) {
         id = json.optString("id");
@@ -38,66 +42,56 @@ public class FraudCase {
         return new FraudCase(json);
     }
 
+    public void attachScript(StoryScript value) { script = value; }
+
     public String searchableText() {
-        return (title + category + materialType + summary + story + warningSigns + response + sourceName).toLowerCase();
+        StringBuilder text = new StringBuilder();
+        text.append(title).append(category).append(materialType).append(summary).append(story)
+            .append(warningSigns).append(response).append(sourceName);
+        if (script != null) text.append(script.title).append(script.teaser).append(script.shelf);
+        return text.toString().toLowerCase(Locale.ROOT);
     }
 
     public String publicTitle() {
-        switch (id) {
-            case "rebate-task": return "凌晨一点的兼职群";
-            case "fake-investment": return "老师只带最后五个人";
-            case "fake-shopping": return "橱窗里最后一件礼物";
-            case "fake-loan": return "审批通过之后";
-            case "fake-credit-repair": return "毕业多年的那笔账户";
-            case "fake-customer-service": return "一通准确说出订单的电话";
-            case "impersonate-leader": return "会议中的临时指令";
-            case "fake-prosecutor": return "来自异地的紧急调查";
-            case "dating-investment": return "海风那边的人";
-            case "online-game": return "绝版账号的买家";
-            case "fake-service": return "据说能解决问题的人";
-            case "sextortion": return "深夜的新好友";
-            case "pension": return "母亲参加的周末讲座";
-            case "ai-impersonation": return "视频里的大学室友";
-            case "cross-border-job": return "一份包机票的工作";
-            case "overseas-call-center": return "海岛来电";
-            case "smishing": return "积分清零前的十分钟";
-            case "ticket": return "开场前四十八小时";
-            case "charity": return "雨夜里的求助链接";
-            case "receipt-code": return "少了一笔的晚班账单";
-            case "deepfake-cfo": return "屏幕里的整个会议室";
-            case "sim-swap": return "忽然消失的手机信号";
-            case "crypto-romance": return "她说想和你计划未来";
-            case "parcel-mule": return "客厅里堆起的快递箱";
-            case "quishing": return "停车场里的新二维码";
-            case "task-app-front-running": return "永不休息的交易程序";
-            case "real-friend-help": return "老同学的凌晨消息";
-            case "real-bank-alert": return "被你挂断的银行电话";
-            case "real-seller": return "不肯降价的二手卖家";
-            case "real-colleague": return "同事忘带的门禁卡";
-            case "real-family-transfer": return "父亲第一次开口借钱";
-            default: return "一次需要判断的相遇";
-        }
+        if (script != null && !script.title.isEmpty()) return script.title;
+        return title.isEmpty() ? "一次需要判断的相遇" : title;
     }
 
     public String publicTeaser() {
-        switch (id) {
-            case "real-friend-help": return "多年没联系的人突然出现。你记得旧情，也记得那些新闻。";
-            case "real-bank-alert": return "陌生号码知道你的姓名和卡片尾号。接听还是挂断，都可能有代价。";
-            case "real-seller": return "交易规则并不完美，对方的坚持究竟是可疑，还是有自己的理由？";
-            case "real-colleague": return "一个不合规的小请求，夹在信任、制度和同事关系之间。";
-            case "real-family-transfer": return "最亲近的人也可能说不清来龙去脉。核验会不会等于不信任？";
-            default: return "信息看起来足够真实，但真正重要的细节还没有浮出水面。";
-        }
+        if (script != null && !script.teaser.isEmpty()) return script.teaser;
+        return summary.isEmpty() ? "信息看起来足够真实，但真正重要的细节还没有浮出水面。" : summary;
     }
 
     public String publicShelf() {
-        switch (id) {
-            case "real-friend-help": case "real-family-transfer": case "ai-impersonation": case "dating-investment": case "crypto-romance": return "熟人之间";
-            case "real-bank-alert": case "fake-customer-service": case "fake-credit-repair": case "fake-prosecutor": case "sim-swap": case "smishing": return "一通来电";
-            case "real-seller": case "fake-shopping": case "online-game": case "ticket": case "quishing": case "receipt-code": return "一次交易";
-            case "real-colleague": case "impersonate-leader": case "deepfake-cfo": case "cross-border-job": case "parcel-mule": return "工作现场";
-            default: return "生活岔路";
-        }
+        if (script != null && !script.shelf.isEmpty()) return script.shelf;
+        return category.isEmpty() ? "生活岔路" : category;
+    }
+
+    /** Endings are the nodes without choices, so the count is the real branch breadth. */
+    public int endingCount() {
+        if (script == null) return 0;
+        int total = 0;
+        for (StoryScript.Node node : script.nodes) if (node.choices.isEmpty()) total++;
+        return total;
+    }
+
+    public int decisionCount() {
+        if (script == null) return 0;
+        return script.nodes.size() - endingCount();
+    }
+
+    /** Rough reading time:每个决策节点约一分半，加上结局总结页的阅读时间。 */
+    public String durationLabel() {
+        int decisions = decisionCount();
+        if (decisions <= 0) return "互动故事";
+        int minutes = Math.max(3, Math.min(15, 3 + (int) Math.round(decisions * 1.2)));
+        return "约 " + minutes + " 分钟";
+    }
+
+    public String branchLabel() {
+        int endings = endingCount();
+        if (endings <= 0) return "真假不预告 · 你的判断会改变关系与结局";
+        return endings + " 种结局 · 真假不预告，每个结局都有完整复盘";
     }
 
     private static String join(JSONArray array) {

@@ -1,48 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:fitsSystemWindows="true"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:fitsSystemWindows="true"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/background" android:orientation="vertical">
+    android:orientation="vertical">
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:background="@color/background" android:gravity="center_vertical" android:orientation="horizontal"
-        android:paddingStart="8dp" android:paddingTop="8dp" android:paddingEnd="16dp" android:paddingBottom="8dp">
-        <Button android:id="@+id/storyBack" android:layout_width="48dp" android:layout_height="44dp"
-            android:backgroundTint="@android:color/transparent" android:text="‹" android:textColor="@color/ink" android:textSize="30sp" />
+        android:background="@color/bg_page" android:gravity="center_vertical" android:orientation="horizontal"
+        android:paddingStart="@dimen/space_2" android:paddingTop="@dimen/space_1" android:paddingEnd="@dimen/space_2" android:paddingBottom="@dimen/space_1">
+        <Button android:id="@+id/storyBack" android:layout_width="@dimen/touch_min" android:layout_height="@dimen/touch_min"
+            android:backgroundTint="@android:color/transparent" android:contentDescription="@string/story_back"
+            android:text="@string/story_back_glyph" android:textColor="@color/text_primary" android:textSize="28sp" />
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
             <TextView android:id="@+id/storyTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:maxLines="2" android:textColor="@color/ink" android:textSize="17sp" android:textStyle="bold" />
+                android:maxLines="2" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
             <TextView android:id="@+id/storyStage" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="2dp" android:textColor="@color/muted" android:textSize="12sp" />
+                android:layout_marginTop="2dp" android:maxLines="2" android:textColor="@color/text_secondary" android:textSize="12sp" />
         </LinearLayout>
+        <com.google.android.material.button.MaterialButton android:id="@+id/storyJump"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="@dimen/touch_min" android:layout_height="@dimen/touch_min" android:contentDescription="@string/story_jump"
+            app:icon="@drawable/ic_route" app:iconGravity="textStart" app:iconPadding="0dp" app:iconTint="@color/brand" />
     </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_subtle" />
 
     <LinearLayout android:id="@+id/storySteps" android:layout_width="match_parent" android:layout_height="wrap_content"
         android:gravity="center" android:orientation="horizontal"
-        android:paddingStart="20dp" android:paddingTop="4dp" android:paddingEnd="20dp" android:paddingBottom="2dp" />
+        android:paddingStart="@dimen/space_5" android:paddingTop="@dimen/space_1" android:paddingEnd="@dimen/space_5" android:paddingBottom="@dimen/space_1" />
 
     <ScrollView android:id="@+id/storyScroll" android:layout_width="match_parent" android:layout_height="0dp"
         android:layout_weight="1" android:fillViewport="true">
         <LinearLayout android:id="@+id/storyContent" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="vertical" android:paddingStart="20dp" android:paddingTop="12dp" android:paddingEnd="20dp" android:paddingBottom="20dp">
+            android:orientation="vertical" android:paddingStart="@dimen/space_5" android:paddingTop="@dimen/space_3" android:paddingEnd="@dimen/space_5" android:paddingBottom="@dimen/space_5">
 
             <LinearLayout android:id="@+id/storyGameArea" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                 <TextView android:id="@+id/storyStatus" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:background="@drawable/bg_chip" android:padding="10dp" android:textColor="@color/accent" android:textSize="13sp" android:textStyle="bold" />
+                    android:background="@drawable/bg_chip" android:padding="@dimen/space_3" android:textColor="@color/brand" android:textSize="13sp" android:textStyle="bold" />
                 <TextView android:id="@+id/storyScene" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp" android:lineSpacingMultiplier="1.32" android:textColor="@color/ink" android:textSize="17sp" />
+                    android:layout_marginTop="@dimen/space_3" android:lineSpacingMultiplier="1.5" android:textColor="@color/text_primary" android:textSize="17sp" />
                 <TextView android:id="@+id/storyPrompt" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp" android:text="你会怎么做？" android:textColor="@color/ink" android:textSize="16sp" android:textStyle="bold" />
+                    android:layout_marginTop="@dimen/space_4" android:text="@string/story_prompt_default" android:textColor="@color/text_primary" android:textSize="16sp" android:textStyle="bold" />
                 <LinearLayout android:id="@+id/storyChoices" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp" android:orientation="vertical" />
+                    android:layout_marginTop="@dimen/space_2" android:orientation="vertical" />
                 <LinearLayout android:id="@+id/storyFeedback" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp" android:background="@drawable/bg_card" android:orientation="vertical"
-                    android:padding="16dp" android:visibility="gone">
+                    android:layout_marginTop="@dimen/space_2" android:background="@drawable/bg_card" android:orientation="vertical"
+                    android:padding="@dimen/space_4" android:visibility="gone">
                     <TextView android:id="@+id/feedbackTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:textColor="@color/ink" android:textSize="18sp" android:textStyle="bold" />
+                        android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold" />
                     <TextView android:id="@+id/feedbackBody" android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp" android:lineSpacingMultiplier="1.25" android:textColor="@color/muted" android:textSize="15sp" />
-                    <Button android:id="@+id/storyContinue" android:layout_width="match_parent" android:layout_height="52dp"
-                        android:layout_marginTop="12dp" android:text="继续" />
+                        android:layout_marginTop="@dimen/space_2" android:lineSpacingMultiplier="1.5" android:textColor="@color/text_secondary" android:textSize="16sp" />
+                    <Button android:id="@+id/storyContinue" android:layout_width="match_parent" android:layout_height="@dimen/touch_min"
+                        android:layout_marginTop="@dimen/space_3" android:text="@string/story_continue" android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
 

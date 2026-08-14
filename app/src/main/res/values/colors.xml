@@ -1,15 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Anti-fraud "Truth Journal" palette -->
-    <color name="brand_red">#9B1B30</color>
-    <color name="brand_red_dark">#6B121E</color>
-    <color name="warning">#D4A017</color>
-    <color name="success">#2D6A4F</color>
-    <color name="accent">#1E2A4F</color>
-    <color name="accent_container">#E8ECF4</color>
-    <color name="ink">#1B1B1B</color>
-    <color name="muted">#5C5C5C</color>
-    <color name="line">#D9D3C8</color>
-    <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#F5F1EB</color>
-    <color name="background">#FBF7F0</color>
+    <!--
+      防诈课堂 · 语义色板（Truth Journal）
+      产品类型：内容型互动学习 App。视觉方向：可信、克制、纸面感。
+      所有正文组合均已按 WCAG AA 4.5:1 校验，校验记录见 docs/design-tokens.md。
+    -->
+
+    <!-- 背景层级 -->
+    <color name="bg_page">#FBF7F0</color>
+    <color name="bg_surface">#FFFFFF</color>
+    <color name="bg_elevated">#F5F1EB</color>
+
+    <!-- 文本层级 -->
+    <color name="text_primary">#1B1B1B</color>
+    <color name="text_secondary">#4A4A4A</color>
+    <color name="text_tertiary">#6B6B6B</color>
+    <color name="text_on_brand">#FFFFFF</color>
+
+    <!-- 品牌 -->
+    <color name="brand">#1E2A4F</color>
+    <color name="brand_muted">#46527A</color>
+    <color name="brand_subtle">#E8ECF4</color>
+
+    <!-- 按压水波纹：品牌色约 8% 透明度 -->
+    <color name="ripple_surface">#221E2A4F</color>
+
+    <!-- 边框 -->
+    <color name="border_subtle">#D9D3C8</color>
+    <color name="border_strong">#B9B1A2</color>
+
+    <!-- 状态色：均搭配图标与文字，不单独承担语义 -->
+    <color name="state_safe">#2D6A4F</color>
+    <color name="state_safe_container">#E3F0E8</color>
+    <color name="state_caution">#8A5A00</color>
+    <color name="state_caution_container">#FBEFD6</color>
+    <color name="state_loss">#A0522D</color>
+    <color name="state_loss_container">#F6E6DC</color>
+    <color name="state_critical">#9B1B30</color>
+    <color name="state_critical_container">#F7E3E6</color>
+    <color name="state_rift">#5A5570</color>
+    <color name="state_rift_container">#ECEAF2</color>
+    <color name="state_naive">#5E6B2F</color>
+    <color name="state_naive_container">#EDF0E0</color>
+
+    <!-- 进度指示 -->
+    <color name="progress_done">#1E2A4F</color>
+    <color name="progress_current">#8A5A00</color>
+    <color name="progress_todo">#CFC7B8</color>
+
 </resources>
