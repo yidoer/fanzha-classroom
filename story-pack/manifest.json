@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "packVersion": 2,
   "minAppVersionCode": 6,
-  "downloadUrl": "https://raw.githubusercontent.com/yidoer/fanzha-classroom/master/releases/story-pack-v2.json",
+  "downloadUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/stories-v2/story-pack.json",
   "sha256": "ceafa564ac6aa4694527af4a7aff477b0457a6f1cc550db001285b1207e7cfb2",
   "changelog": "v0.6.0 内置案例库：38 个真实案例改编素材，含骗局与非骗局样本。",
   "latestAppVersionCode": 6,
   "latestAppVersionName": "0.6.0",
-  "apkUrl": "https://raw.githubusercontent.com/yidoer/fanzha-classroom/master/releases/fanzha-classroom-0.6.0-debug.apk",
+  "apkUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.6.0/fanzha-classroom-0.6.0-debug.apk",
   "apkSha256": "4454b767abd105ddcc174a6bc12b76801f221cb4510ed8cacc574e1ba3b9423b",
   "appChangelog": "12 篇互动故事、48 种结局、217 条路径、结局总结页、节点跳转、进度完善、应用内更新与回退。"
 }

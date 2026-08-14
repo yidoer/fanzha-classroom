@@ -22,8 +22,8 @@ App 与剧情包独立版本化。功能迭代使用 Android 的 `versionCode` /
 当前仓库已配置为无需自建服务器：
 
 - 清单地址：`https://raw.githubusercontent.com/yidoer/fanzha-classroom/master/story-pack/manifest.json`
-- 剧情包地址：`https://raw.githubusercontent.com/yidoer/fanzha-classroom/master/releases/story-pack-v2.json`
-- APK 地址：`https://raw.githubusercontent.com/yidoer/fanzha-classroom/master/releases/fanzha-classroom-0.6.0-debug.apk`
+- 剧情包地址：`https://github.com/yidoer/fanzha-classroom/releases/download/stories-v2/story-pack.json`
+- APK 地址：`https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.6.0/fanzha-classroom-0.6.0-debug.apk`
 
 更新普通案例剧情时：
 
