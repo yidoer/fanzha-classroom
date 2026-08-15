@@ -10,3 +10,9 @@ local.properties
 '*.apk'
 '!releases/*.apk'
 '!fanzha-classroom-*.apk'
+.claude/
+.gradle-home/
+.gradle-native/
+.gradle-runtime/
+.screenshots/
+story-pack.sha256

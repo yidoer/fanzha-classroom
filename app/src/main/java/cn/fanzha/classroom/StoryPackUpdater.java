@@ -24,15 +24,23 @@ public final class StoryPackUpdater {
     }
 
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
-    private static final int PACK_SCHEMA = 1;
+    private static final int PACK_SCHEMA = 1; // 兼容 v1；v2 允许 cases+stories 双结构
     private StoryPackUpdater() {}
 
     public static File activePackFile(Context context) {
         return new File(new File(context.getFilesDir(), "story-packs"), "active.json");
     }
 
+    public static File activeStoriesFile(Context context) {
+        return new File(new File(context.getFilesDir(), "story-packs"), "stories.json");
+    }
+
     private static File previousPackFile(Context context) {
         return new File(new File(context.getFilesDir(), "story-packs"), "previous.json");
+    }
+
+    private static File previousStoriesFile(Context context) {
+        return new File(new File(context.getFilesDir(), "story-packs"), "previous-stories.json");
     }
 
     public static int currentVersion(Context context) {
@@ -129,6 +137,22 @@ public final class StoryPackUpdater {
         if (previous.exists() && !previous.delete()) throw new IllegalStateException("无法清理历史剧情");
         if (target.exists() && !target.renameTo(previous)) throw new IllegalStateException("无法备份旧剧情");
         if (!pending.renameTo(target)) throw new IllegalStateException("无法启用新剧情");
+
+        // 如果剧情包包含互动剧本，将其拆存到独立文件供 StoryRepository 热加载。
+        JSONObject downloadedRoot = new JSONObject(new String(bytes, StandardCharsets.UTF_8));
+        if (downloadedRoot.has("stories")) {
+            JSONObject storiesRoot = new JSONObject();
+            storiesRoot.put("stories", downloadedRoot.getJSONArray("stories"));
+            File storiesPending = new File(directory, "stories-pending.json");
+            try (FileOutputStream output = new FileOutputStream(storiesPending)) {
+                output.write(storiesRoot.toString().getBytes(StandardCharsets.UTF_8)); output.getFD().sync();
+            }
+            File storiesTarget = activeStoriesFile(context);
+            File storiesPrevious = previousStoriesFile(context);
+            if (storiesPrevious.exists() && !storiesPrevious.delete()) throw new IllegalStateException("无法清理历史互动剧情");
+            if (storiesTarget.exists() && !storiesTarget.renameTo(storiesPrevious)) throw new IllegalStateException("无法备份旧互动剧情");
+            if (!storiesPending.renameTo(storiesTarget)) throw new IllegalStateException("无法启用新互动剧情");
+        }
         context.getSharedPreferences("story_pack", Context.MODE_PRIVATE).edit().putInt("version", remoteVersion).apply();
         return new Result(true, "剧情已更新至 v" + remoteVersion + "，重新进入故事即可体验");
     }
@@ -154,7 +178,9 @@ public final class StoryPackUpdater {
     private static void validatePack(byte[] bytes, int expectedVersion) throws Exception {
         JSONObject root = new JSONObject(new String(bytes, StandardCharsets.UTF_8));
         JSONObject meta = root.getJSONObject("meta");
-        if (meta.getInt("schemaVersion") != PACK_SCHEMA || meta.getInt("packVersion") != expectedVersion)
+        int schema = meta.getInt("schemaVersion");
+        if (schema != PACK_SCHEMA && schema != 2) throw new IllegalArgumentException("不支持的剧情包格式");
+        if (meta.getInt("packVersion") != expectedVersion)
             throw new IllegalArgumentException("剧情包版本不一致");
         JSONArray cases = root.getJSONArray("cases");
         if (cases.length() < 1 || cases.length() > 1000) throw new IllegalArgumentException("剧情数量异常");
@@ -173,3 +199,5 @@ public final class StoryPackUpdater {
         return result.toString();
     }
 }
+
+

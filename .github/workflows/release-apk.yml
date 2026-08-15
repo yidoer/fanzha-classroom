@@ -1,0 +1,30 @@
+name: Release APK
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag such as app-v0.7.0
+        required: true
+      apk_path:
+        description: Path to debug APK (e.g., releases/fanzha-classroom-0.7.0-debug.apk)
+        required: true
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify APK exists
+        run: test -f "${{ inputs.apk_path }}"
+      - name: Generate SHA256
+        id: sha
+        run: |
+          sha256sum "${{ inputs.apk_path }}" | awk '{print $1}' > apk.sha256
+          echo "sha256=$(cat apk.sha256)" >> $GITHUB_OUTPUT
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          files: |
+            ${{ inputs.apk_path }}
+            apk.sha256

@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Release tag such as stories-v2
+        description: Release tag such as stories-v3
         required: true
 permissions:
   contents: write
@@ -18,7 +18,8 @@ jobs:
       - name: Validate and package
         run: |
           node tools/validate_story_pack.js app/src/main/assets/fraud_cases.json
-          cp app/src/main/assets/fraud_cases.json story-pack.json
+          node tools/validate_interactive_stories.js app/src/main/assets/interactive_stories.json
+          node tools/build_story_pack.js
           sha256sum story-pack.json > story-pack.sha256
       - uses: softprops/action-gh-release@v2
         with:
@@ -26,3 +27,4 @@ jobs:
           files: |
             story-pack.json
             story-pack.sha256
+

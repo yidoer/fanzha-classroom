@@ -52,10 +52,11 @@
 
     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_subtle" />
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="@dimen/nav_bar_height" android:background="@color/bg_surface"
+    <LinearLayout android:layout_width="match_parent" android:layout_height="@dimen/nav_bar_height" android:background="@color/bg_surface" android:elevation="4dp"
         android:orientation="horizontal" android:paddingTop="@dimen/space_1" android:paddingBottom="@dimen/space_1">
         <Button android:id="@+id/navCases" style="@style/NavButton" android:drawableTop="@drawable/ic_library" android:drawablePadding="3dp" android:text="@string/nav_stories" />
         <Button android:id="@+id/navFavorites" style="@style/NavButton" android:drawableTop="@drawable/ic_bookmark" android:drawablePadding="3dp" android:text="@string/nav_favorites" />
         <Button android:id="@+id/navEmergency" style="@style/NavButton" android:drawableTop="@drawable/ic_emergency" android:drawablePadding="3dp" android:text="@string/nav_emergency" />
     </LinearLayout>
 </LinearLayout>
+

@@ -5,6 +5,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,11 +18,19 @@ public final class StoryRepository {
 
     public static Map<String,StoryScript> load(Context context){
         Map<String,StoryScript> result=new LinkedHashMap<>();
-        try(BufferedReader reader=new BufferedReader(new InputStreamReader(context.getAssets().open("interactive_stories.json")))){
+        File downloaded = StoryPackUpdater.activeStoriesFile(context);
+        try (InputStream input = downloaded.isFile() ? new FileInputStream(downloaded) : context.getAssets().open("interactive_stories.json");
+             BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
             StringBuilder text=new StringBuilder();String line;while((line=reader.readLine())!=null)text.append(line);
             JSONArray stories=new JSONObject(text.toString()).getJSONArray("stories");
             for(int i=0;i<stories.length();i++){StoryScript story=StoryScript.fromJson(stories.getJSONObject(i));result.put(story.id,story);}
-        }catch(Exception e){throw new IllegalStateException("互动剧情加载失败",e);}
+        }catch(Exception e){
+            if (downloaded.isFile()) {
+                downloaded.delete();
+                return load(context);
+            }
+            throw new IllegalStateException("互动剧情加载失败",e);
+        }
         return result;
     }
 
