@@ -1,30 +1,39 @@
 name: Release APK
+
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: Release tag such as app-v0.7.0
+      version:
+        description: "Release version such as 0.7.1"
         required: true
-      apk_path:
-        description: Path to debug APK (e.g., releases/fanzha-classroom-0.7.0-debug.apk)
-        required: true
+
 permissions:
   contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify APK exists
-        run: test -f "${{ inputs.apk_path }}"
-      - name: Generate SHA256
-        id: sha
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon --console=plain
+      - name: Prepare release assets
         run: |
-          sha256sum "${{ inputs.apk_path }}" | awk '{print $1}' > apk.sha256
-          echo "sha256=$(cat apk.sha256)" >> $GITHUB_OUTPUT
+          mkdir -p releases
+          cp app/build/outputs/apk/debug/app-debug.apk releases/fanzha-classroom-${{ inputs.version }}-debug.apk
+          sha256sum releases/fanzha-classroom-${{ inputs.version }}-debug.apk | awk '{print $1}' > releases/fanzha-classroom-${{ inputs.version }}-debug.apk.sha256
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.tag }}
+          tag_name: app-v${{ inputs.version }}
+          name: FanZha Classroom v${{ inputs.version }}
+          body: |
+            Automated debug APK build for v${{ inputs.version }}.
           files: |
-            ${{ inputs.apk_path }}
-            apk.sha256
+            releases/fanzha-classroom-${{ inputs.version }}-debug.apk
+            releases/fanzha-classroom-${{ inputs.version }}-debug.apk.sha256

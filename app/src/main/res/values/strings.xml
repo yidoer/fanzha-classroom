@@ -10,7 +10,6 @@
     <string name="badge_cleared">已通关</string>
     <string name="favorite_story">收藏故事</string>
     <string name="story_back">返回</string>
-    <string name="story_back_glyph">&#8249;</string>
     <string name="story_jump">进度跳转</string>
     <string name="story_prompt_default">你会怎么做？</string>
     <string name="story_continue">继续</string>
@@ -22,4 +21,9 @@
     <string name="empty_favorites">还没有收藏任何故事\n去「故事」页挑一篇开始吧</string>
     <string name="empty_search_fmt">没有找到与「%1$s」相关的故事</string>
     <string name="empty_category">这个分类下暂时没有可阅读的故事</string>
+    <string name="search_clear">清空搜索</string>
+    <string name="emergency_call_title">立即拨打 110</string>
+    <string name="emergency_call_body">请用手机拨号键盘直接拨打 110。通话前先挂断与骗子的联系，不要再补交任何“保证金”“解冻费”。公安机关不会要求你把钱转入“安全账户”。</string>
+    <string name="emergency_copy_number">复制号码 110</string>
+    <string name="emergency_copied">号码 110 已复制</string>
 </resources>

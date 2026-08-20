@@ -139,12 +139,10 @@ public class StoryActivity extends AppCompatActivity {
         for(int i=0;i<shown;i++){
             TextView dot=new TextView(this);
             int size=dp(9);
-            GradientDrawable bg=new GradientDrawable();
-            bg.setShape(GradientDrawable.OVAL);
-            if(i<stepCount-1)bg.setColor(c(R.color.progress_done));
-            else if(i==stepCount-1)bg.setColor(c(R.color.progress_current));
-            else bg.setColor(c(R.color.progress_todo));
-            dot.setBackground(bg);
+            int color = i<stepCount-1 ? c(R.color.progress_done)
+                    : i==stepCount-1 ? c(R.color.progress_current) : c(R.color.progress_todo);
+            dot.setBackgroundResource(R.drawable.bg_story_dot);
+            dot.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
             LinearLayout.LayoutParams dp2=new LinearLayout.LayoutParams(size,size);
             dp2.gravity=Gravity.CENTER_VERTICAL;
             dot.setLayoutParams(dp2);stepDots.add(dot);
@@ -190,11 +188,16 @@ public class StoryActivity extends AppCompatActivity {
         TextView button=new TextView(this);button.setText(c.label);
         button.setTextSize(16);button.setTextColor(c(R.color.text_primary));
         button.setGravity(Gravity.CENTER_VERTICAL);button.setPadding(dp(16),dp(10),dp(16),dp(10));
-        button.setBackgroundResource(R.drawable.bg_choice);
+        button.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_arrow_forward,0);
+        button.setCompoundDrawablePadding(dp(12));
+        button.setBackgroundResource(R.drawable.bg_choice_v2);
         button.setLineSpacing(0,1.2f);
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
         p.setMargins(0,0,0,dp(10));button.setMinHeight(dp(62));button.setLayoutParams(p);
+        button.setAlpha(0f);button.setTranslationY(dp(8));
+        button.animate().alpha(1f).translationY(0f).setDuration(180)
+            .setStartDelay(choices.getChildCount()*35L).start();
         button.setOnClickListener(v->choose(c));choices.addView(button);
     }
 
@@ -204,6 +207,9 @@ public class StoryActivity extends AppCompatActivity {
         decisions.add(node.chapter+"："+c.label);
         choices.setVisibility(View.GONE);prompt.setVisibility(View.GONE);
         feedback.setVisibility(View.VISIBLE);
+        feedback.setAlpha(0f);
+        feedback.setTranslationY(dp(8));
+        feedback.animate().alpha(1f).translationY(0f).setDuration(200).start();
         feedbackTitle.setText(c.feedbackTitle);feedbackBody.setText(c.feedback);
 
         StoryScript.Node target=c.nextNode.isEmpty()?null:nodeMap.get(c.nextNode);
@@ -215,7 +221,7 @@ public class StoryActivity extends AppCompatActivity {
                 else debrief(null);
             }else{currentNodeId=c.nextNode;render();}
         });
-        scrollView.post(()->scrollView.smoothScrollTo(0,feedback.getTop()));
+        scrollView.post(()->scrollView.smoothScrollTo(0,Math.max(0,feedback.getTop()+gameArea.getTop())));
     }
 
     /** Summary page. Reached from every ending, including 1-step early exits. */

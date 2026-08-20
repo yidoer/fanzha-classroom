@@ -4,16 +4,19 @@
     android:orientation="vertical">
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:background="@color/bg_page" android:gravity="center_vertical" android:orientation="horizontal"
+        android:background="@drawable/bg_header" android:gravity="center_vertical" android:orientation="horizontal"
         android:paddingStart="@dimen/space_2" android:paddingTop="@dimen/space_1" android:paddingEnd="@dimen/space_2" android:paddingBottom="@dimen/space_1">
-        <Button android:id="@+id/storyBack" android:layout_width="@dimen/touch_min" android:layout_height="@dimen/touch_min"
-            android:backgroundTint="@android:color/transparent" android:contentDescription="@string/story_back"
-            android:text="@string/story_back_glyph" android:textColor="@color/text_primary" android:textSize="28sp" />
+        <ImageButton android:id="@+id/storyBack" android:layout_width="@dimen/touch_min" android:layout_height="@dimen/touch_min"
+            android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/story_back"
+            android:padding="@dimen/space_3" android:src="@drawable/ic_back" />
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
             <TextView android:id="@+id/storyTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:maxLines="2" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
-            <TextView android:id="@+id/storyStage" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="2dp" android:maxLines="2" android:textColor="@color/text_secondary" android:textSize="12sp" />
+            <TextView android:id="@+id/storyStage" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="2dp" android:background="@drawable/bg_chip_chapter"
+                android:maxLines="2" android:paddingStart="@dimen/space_3" android:paddingTop="@dimen/space_1"
+                android:paddingEnd="@dimen/space_3" android:paddingBottom="@dimen/space_1"
+                android:textColor="@color/brand" android:textSize="12sp" android:textStyle="bold" />
         </LinearLayout>
         <com.google.android.material.button.MaterialButton android:id="@+id/storyJump"
             style="@style/Widget.Material3.Button.IconButton"
@@ -24,8 +27,8 @@
     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_subtle" />
 
     <LinearLayout android:id="@+id/storySteps" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:gravity="center" android:orientation="horizontal"
-        android:paddingStart="@dimen/space_5" android:paddingTop="@dimen/space_1" android:paddingEnd="@dimen/space_5" android:paddingBottom="@dimen/space_1" />
+        android:background="@drawable/bg_search" android:gravity="center" android:orientation="horizontal"
+        android:layout_marginStart="@dimen/space_4" android:layout_marginTop="@dimen/space_2" android:layout_marginEnd="@dimen/space_4" android:layout_marginBottom="@dimen/space_2" android:paddingStart="@dimen/space_5" android:paddingTop="@dimen/space_2" android:paddingEnd="@dimen/space_5" android:paddingBottom="@dimen/space_2" />
 
     <ScrollView android:id="@+id/storyScroll" android:layout_width="match_parent" android:layout_height="0dp"
         android:layout_weight="1" android:fillViewport="true">
@@ -34,7 +37,7 @@
 
             <LinearLayout android:id="@+id/storyGameArea" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                 <TextView android:id="@+id/storyStatus" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:background="@drawable/bg_chip" android:padding="@dimen/space_3" android:textColor="@color/brand" android:textSize="13sp" android:textStyle="bold" />
+                    android:background="@drawable/bg_chip" android:padding="@dimen/space_3" android:textColor="@color/brand" android:textSize="14sp" android:textStyle="bold" />
                 <TextView android:id="@+id/storyScene" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_3" android:lineSpacingMultiplier="1.5" android:textColor="@color/text_primary" android:textSize="17sp" />
                 <TextView android:id="@+id/storyPrompt" android:layout_width="match_parent" android:layout_height="wrap_content"

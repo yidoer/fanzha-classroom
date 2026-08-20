@@ -5,9 +5,9 @@
   "downloadUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json",
   "sha256": "fc56e2f06154e706deb36945b0bc88df9a74ed31a8648ec823cfb427da5daeb7",
   "changelog": "互动剧情热更新：v0.7.0 后不再需要重新安装 APK 即可更新普通案例与多结局互动剧本。",
-  "latestAppVersionCode": 7,
-  "latestAppVersionName": "0.7.0",
-  "apkUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.0/fanzha-classroom-0.7.0-debug.apk",
-  "apkSha256": "4454b767abd105ddcc174a6bc12b76801f221cb4510ed8cacc574e1ba3b9423b",
-  "appChangelog": "12 篇互动故事、48 种结局、217 条路径、结局总结页、节点跳转、进度完善、应用内更新与回退。"
+  "latestAppVersionCode": 8,
+  "latestAppVersionName": "0.7.1",
+  "apkUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.1/fanzha-classroom-0.7.1-debug.apk",
+  "apkSha256": "d1fcb5cfccfbd11a88205257b2a37fdca4481f4494d430d9ea75b09dbda88b6e",
+  "appChangelog": "0.7.1：纸面主题收口、止损步骤卡、空状态图标、故事选项动效与箭头、进度条容器优化、GitHub 自动构建发布工作流恢复。"
 }

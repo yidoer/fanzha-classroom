@@ -8,8 +8,8 @@ android {
         applicationId 'cn.fanzha.classroom'
         minSdk 23
         targetSdk 35
-        versionCode 7
-        versionName '0.7.0'
+        versionCode 8
+        versionName '0.7.1'
         def storyManifestUrl = project.findProperty('STORY_MANIFEST_URL') ?: ''
         buildConfigField 'String', 'STORY_MANIFEST_URL', '"' + storyManifestUrl + '"'
         def storyFallbackUrl = project.findProperty('STORY_FALLBACK_MANIFEST_URL') ?: ''

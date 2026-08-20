@@ -22,8 +22,8 @@ App 与剧情包独立版本化。功能迭代使用 Android 的 `versionCode` /
 当前仓库已配置为无需自建服务器：
 
 - 清单地址：`https://raw.githubusercontent.com/yidoer/fanzha-classroom/master/story-pack/manifest.json`
-- 剧情包地址：`https://github.com/yidoer/fanzha-classroom/releases/download/stories-v2/story-pack.json`
-- APK 地址：`https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.6.0/fanzha-classroom-0.6.0-debug.apk`
+- 剧情包地址：`https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json`
+- APK 地址：`https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.1/fanzha-classroom-0.7.1-debug.apk`
 
 更新普通案例剧情时：
 
@@ -34,4 +34,4 @@ App 与剧情包独立版本化。功能迭代使用 Android 的 `versionCode` /
 5. 更新 `story-pack/manifest.json` 的 `packVersion`、`downloadUrl`、`sha256` 和 `changelog`。
 6. 提交并推送到 GitHub。用户在应用内点击“检查剧情更新”即可下载，失败时会自动重试并保留旧包。
 
-注意：`interactive_stories.json` 的多结局互动故事目前仍随 APK 发布。若要让互动故事也应用内热更新，下一版需要把互动故事文件纳入剧情包校验、下载、回退流程。
+注意：从 v3 剧情包开始，互动故事与普通案例一起随剧情包热更新；下载、SHA-256 校验、备份和回退流程同时覆盖 `cases` 与 `stories`。

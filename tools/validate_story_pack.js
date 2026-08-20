@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const file = process.argv[2] || 'app/src/main/assets/fraud_cases.json';
 const root = JSON.parse(fs.readFileSync(file, 'utf8'));
 const errors = [];
-if (root.meta?.schemaVersion !== 1) errors.push('meta.schemaVersion must be 1');
+if (root.meta?.schemaVersion !== 1 && root.meta?.schemaVersion !== 2) errors.push('meta.schemaVersion must be 1 or 2');
 if (!Number.isInteger(root.meta?.packVersion) || root.meta.packVersion < 1) errors.push('meta.packVersion must be positive');
 if (!Array.isArray(root.cases) || root.cases.length < 1) errors.push('cases must not be empty');
 const ids = new Set();

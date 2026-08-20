@@ -7,27 +7,27 @@
     <color name="bg_page">#F8F6F2</color>
     <color name="bg_surface">#FFFFFF</color>
     <color name="bg_elevated">#F1EDE6</color>
-    <color name="bg_card">#FFFFFF</color>
+
 
     <!-- 文本层级 -->
     <color name="text_primary">#0F172A</color>
     <color name="text_secondary">#334155</color>
-    <color name="text_tertiary">#64748B</color>
+    <color name="text_tertiary">#55667B</color>
     <color name="text_on_brand">#FFFFFF</color>
 
     <!-- 品牌主色（更深的信任蓝） -->
     <color name="brand">#0F172A</color>
-    <color name="brand_variant">#1E2937</color>
+
     <color name="brand_muted">#475569</color>
     <color name="brand_subtle">#E2E8F0</color>
 
     <!-- 警示色系 -->
     <color name="warning">#F59E0B</color>
-    <color name="warning_container">#FEF3C7</color>
+
     <color name="danger">#DC2626</color>
-    <color name="danger_container">#FEE2E2</color>
-    <color name="safe">#15803D</color>
-    <color name="safe_container">#DCFCE7</color>
+
+
+
 
     <!-- 状态色 -->
     <color name="state_safe">#166534</color>
@@ -47,4 +47,19 @@
     <color name="progress_done">#0F172A</color>
     <color name="progress_current">#F59E0B</color>
     <color name="progress_todo">#E2E8F0</color>
+
+    <!-- 状态 container (修复 compile) -->
+    <color name="state_naive">#0891B2</color>
+    <color name="state_loss">#EA580C</color>
+    <color name="state_safe_container">#DCFCE7</color>
+    <color name="state_caution_container">#FEF3C7</color>
+    <color name="state_critical_container">#FEE2E2</color>
+    <color name="state_rift_container">#E0E7FF</color>
+    <color name="state_loss_container">#FFF7ED</color>
+    <color name="state_naive_container">#ECFEFF</color>
+
+    <!-- 纸面细节 -->
+    <color name="surface_warm">#FDFCFA</color>
+    <color name="border_warm">#D8D2C8</color>
+    <color name="chapter_gradient_end">#D6DCE8</color>
 </resources>

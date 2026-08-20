@@ -114,7 +114,8 @@ public final class StoryPackUpdater {
             manifestBytes = download(BuildConfig.STORY_FALLBACK_MANIFEST_URL);
         }
         JSONObject manifest = new JSONObject(new String(manifestBytes, StandardCharsets.UTF_8));
-        if (manifest.getInt("schemaVersion") != PACK_SCHEMA) throw new IllegalArgumentException("不支持的剧情包格式");
+        int schema = manifest.getInt("schemaVersion");
+        if (schema != PACK_SCHEMA && schema != 2) throw new IllegalArgumentException("不支持的剧情包格式");
         int minAppVersion = manifest.optInt("minAppVersionCode", 1);
         if (minAppVersion > BuildConfig.VERSION_CODE) return new Result(false, "新剧情需要先升级 App");
         int remoteVersion = manifest.getInt("packVersion");

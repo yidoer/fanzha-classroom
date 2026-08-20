@@ -2,6 +2,8 @@ package cn.fanzha.classroom;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +15,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -30,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
     private final Set<String> favorites = new LinkedHashSet<>();
     private CaseAdapter adapter;
     private EditText searchInput;
+    private ImageButton clearSearch;
     private LinearLayout controls, categories, infoContent;
     private RecyclerView caseList;
     private ScrollView infoScroll;
@@ -54,6 +60,11 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
 
     private void bindViews() {
         searchInput = findViewById(R.id.searchInput);
+        clearSearch = findViewById(R.id.clearSearch);
+        clearSearch.setOnClickListener(v -> {
+            searchInput.setText("");
+            searchInput.requestFocus();
+        });
         controls = findViewById(R.id.libraryControls);
         categories = findViewById(R.id.categoryContainer);
         caseList = findViewById(R.id.caseList);
@@ -142,23 +153,27 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
         paintChips();
         searchInput.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            public void onTextChanged(CharSequence s, int start, int before, int count) { filterCases(); }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                clearSearch.setVisibility(s.length() == 0 ? View.GONE : View.VISIBLE);
+                filterCases();
+            }
             public void afterTextChanged(Editable s) {}
         });
     }
 
     /** The selected shelf gets a filled chip so the active filter is never ambiguous. */
     private void paintChips() {
-        int accent = c(R.color.brand);
+        int accent = c(R.color.brand_subtle);
         int surface = c(R.color.bg_surface);
         int muted = c(R.color.text_secondary);
         int line = c(R.color.border_subtle);
+        int brand = c(R.color.brand);
         for (java.util.Map.Entry<String, MaterialButton> entry : categoryChips.entrySet()) {
             boolean active = entry.getKey().equals(selectedCategory);
             MaterialButton chip = entry.getValue();
             chip.setBackgroundColor(active ? accent : surface);
-            chip.setTextColor(active ? surface : muted);
-            chip.setStrokeColor(android.content.res.ColorStateList.valueOf(active ? accent : line));
+            chip.setTextColor(active ? brand : muted);
+            chip.setStrokeColor(android.content.res.ColorStateList.valueOf(active ? brand : line));
         }
     }
 
@@ -196,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
     private void updateEmptyState(List<FraudCase> filtered, String query) {
         if (!filtered.isEmpty()) { emptyView.setVisibility(View.GONE); return; }
         emptyView.setVisibility(View.VISIBLE);
+        emptyView.setCompoundDrawablesWithIntrinsicBounds(0, favoritesOnly ? R.drawable.ic_bookmark : (!query.isEmpty() ? R.drawable.ic_search : R.drawable.ic_library), 0, 0);
+        emptyView.setCompoundDrawablePadding(dp(14));
         if (favoritesOnly) emptyView.setText(R.string.empty_favorites);
         else if (!query.isEmpty()) emptyView.setText(getString(R.string.empty_search_fmt, searchInput.getText().toString().trim()));
         else emptyView.setText(R.string.empty_category);
@@ -221,6 +238,8 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
         int idleColor = c(R.color.text_secondary);
         for (int i = 0; i < buttons.length; i++) {
             boolean active = keys[i].equals(activeNav);
+            buttons[i].setBackgroundResource(active ? R.drawable.bg_nav_active : R.drawable.bg_nav_item);
+            buttons[i].setBackgroundTintList(null);
             buttons[i].setTextColor(active ? activeColor : idleColor);
             buttons[i].setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
             android.graphics.drawable.Drawable icon = buttons[i].getCompoundDrawables()[1];
@@ -250,11 +269,50 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
         activeNav = "emergency";
         paintNav();
         showInfo("紧急止损", "已经转账或泄露信息？现在按顺序做");
-        addSection("01 立即止付", "停止与对方联系，不再补交任何“保证金”“解冻费”。立刻联系银行或支付平台申请止付、冻结，并保存受理编号。", "拨打 110", v -> dial("110"));
-        addSection("02 尽快报警", "携带身份证、转账记录、聊天记录、对方账号、网址和安装包信息到就近公安机关报案。时间越早，追回机会越大。", "打开国家反诈中心来源", v -> openUrl("https://www.mps.gov.cn/n2253534/n2253543/c9257095/content.html"));
-        addSection("03 账户加固", "修改支付、网银、邮箱及社交账号密码；开启双重验证；若泄露银行卡或身份证信息，联系银行挂失并关注异常征信。", null, null);
-        addSection("04 固定证据", "截图并导出完整聊天，不要只保留局部；记录对方昵称、账号、电话、收款账户、订单号、域名和 App 名称。不要自行删除涉诈应用。", null, null);
-        addSection("重要提醒", "“网警远程办案”“内部关系追回”“黑客追款”通常是二次诈骗。公安机关不会要求把钱转入所谓安全账户。", null, null);
+        addEmergencyBanner("先停手，再止损", "挂断与对方的联系，不再补交任何“保证金”“解冻费”。先保住剩余资金，再按下面的顺序处理。");
+        addSection("01", "立即止付", "立刻联系银行或支付平台申请止付、冻结，并保存受理编号。若骗子仍在通话，先挂断，不要和他理论。", "110 报警指引", v -> showEmergencyCallDialog(), true);
+        addSection("02", "尽快报警", "携带身份证、转账记录、聊天记录、对方账号、网址和安装包信息到就近公安机关报案。时间越早，追回机会越大。", "查看国家反诈中心", v -> openUrl("https://www.mps.gov.cn/n2253534/n2253543/c9257095/content.html"), false);
+        addSection("03", "账户加固", "修改支付、网银、邮箱及社交账号密码；开启双重验证；若泄露银行卡或身份证信息，联系银行挂失并关注异常征信。", null, null, false);
+        addSection("04", "固定证据", "截图并导出完整聊天，不要只保留局部；记录对方昵称、账号、电话、收款账户、订单号、域名和 App 名称。不要自行删除涉诈应用。", null, null, false);
+        addSection("!", "重要提醒", "“网警远程办案”“内部关系追回”“黑客追款”通常是二次诈骗。公安机关不会要求你把钱转入所谓安全账户。", null, null, true);
+    }
+
+    private void addEmergencyBanner(String title, String body) {
+        LinearLayout card = card();
+        card.setBackgroundResource(R.drawable.bg_card_critical);
+        LinearLayout titleRow = new LinearLayout(this);
+        titleRow.setOrientation(LinearLayout.HORIZONTAL);
+        titleRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        ImageView mark = new ImageView(this);
+        mark.setImageResource(R.drawable.ic_emergency);
+        mark.setImageTintList(android.content.res.ColorStateList.valueOf(c(R.color.state_critical)));
+        mark.setLayoutParams(new LinearLayout.LayoutParams(dp(26), dp(26)));
+        titleRow.addView(mark);
+        TextView titleView = text(title, 18, c(R.color.state_critical), true);
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        titleParams.setMarginStart(dp(10));
+        titleView.setLayoutParams(titleParams);
+        titleRow.addView(titleView);
+        card.addView(titleRow);
+        TextView bodyView = text(body, 15, c(R.color.state_critical), false);
+        bodyView.setLineSpacing(0, 1.3f);
+        bodyView.setPadding(0, dp(8), 0, 0);
+        card.addView(bodyView);
+        infoContent.addView(card);
+    }
+
+    /** 110 guidance stays inside the app; the player dials from their own keypad. */
+    private void showEmergencyCallDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.emergency_call_title)
+                .setMessage(R.string.emergency_call_body)
+                .setPositiveButton("知道了", null)
+                .setNegativeButton(R.string.emergency_copy_number, (d, w) -> {
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    clipboard.setPrimaryClip(ClipData.newPlainText("110", "110"));
+                    Toast.makeText(this, R.string.emergency_copied, Toast.LENGTH_SHORT).show();
+                })
+                .show();
     }
 
     private void showInfo(String title, String subtitle) {
@@ -267,17 +325,45 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
         headerSubtitle.setText(subtitle);
     }
 
-    private void addSection(String title, String body, String action, View.OnClickListener listener) {
+    private void addSection(String step, String title, String body, String action, View.OnClickListener listener, boolean danger) {
         LinearLayout card = card();
-        card.addView(text(title, 19, c(R.color.text_primary), true));
+        LinearLayout titleRow = new LinearLayout(this);
+        titleRow.setOrientation(LinearLayout.HORIZONTAL);
+        titleRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        TextView badge = new TextView(this);
+        badge.setText(step);
+        badge.setTextSize(13);
+        badge.setTypeface(null, Typeface.BOLD);
+        badge.setTextColor(danger ? c(R.color.state_critical) : c(R.color.brand));
+        badge.setBackgroundResource(danger ? R.drawable.bg_chip_critical : R.drawable.bg_chip);
+        badge.setGravity(android.view.Gravity.CENTER);
+        badge.setPadding(dp(6), dp(3), dp(6), dp(3));
+        badge.setLayoutParams(new LinearLayout.LayoutParams(dp(34), dp(30)));
+        titleRow.addView(badge);
+        TextView titleView = text(title, 19, c(R.color.text_primary), true);
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        titleParams.setMarginStart(dp(10));
+        titleView.setLayoutParams(titleParams);
+        titleRow.addView(titleView);
+        card.addView(titleRow);
         TextView bodyView = text(body, 15, c(R.color.text_secondary), false);
         bodyView.setLineSpacing(0, 1.25f);
         bodyView.setPadding(0, dp(8), 0, 0);
         card.addView(bodyView);
         if (action != null) {
-            Button button = new MaterialButton(this);
+            MaterialButton button = new MaterialButton(this);
             button.setText(action);
+            button.setCornerRadius(dp(8));
+            button.setMinHeight(dp(48));
+            if (danger) {
+                button.setBackgroundColor(c(R.color.danger));
+                button.setTextColor(c(R.color.text_on_brand));
+            }
             button.setOnClickListener(listener);
+            LinearLayout.LayoutParams actionParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            actionParams.topMargin = dp(10);
+            button.setLayoutParams(actionParams);
             card.addView(button);
         }
         infoContent.addView(card);
@@ -306,7 +392,6 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
         catch (Exception e) { new AlertDialog.Builder(this).setMessage("无法打开该链接").setPositiveButton("知道了", null).show(); }
     }
 
-    private void dial(String number) { startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number))); }
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
     private int px(int dimenRes) { return getResources().getDimensionPixelSize(dimenRes); }
     private int c(int colorRes) { return ContextCompat.getColor(this, colorRes); }

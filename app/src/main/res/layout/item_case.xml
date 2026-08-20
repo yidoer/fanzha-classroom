@@ -20,10 +20,10 @@
             android:contentDescription="@string/favorite_story" android:padding="@dimen/space_3" android:src="@drawable/ic_bookmark" />
     </LinearLayout>
     <TextView android:id="@+id/title" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_2" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold" />
+        android:layout_marginTop="@dimen/space_2" android:ellipsize="end" android:maxLines="2" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold" />
     <TextView android:id="@+id/summary" android:layout_width="match_parent" android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_2" android:ellipsize="end" android:lineSpacingMultiplier="1.5" android:maxLines="3"
         android:textColor="@color/text_secondary" android:textSize="15sp" />
     <TextView android:id="@+id/source" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_3" android:textColor="@color/text_tertiary" android:textSize="12sp" />
+        android:layout_marginTop="@dimen/space_3" android:ellipsize="end" android:maxLines="1" android:textColor="@color/text_tertiary" android:textSize="12sp" />
 </LinearLayout>
