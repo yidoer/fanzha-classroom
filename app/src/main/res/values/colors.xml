@@ -1,33 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 防诈课堂 v0.7.0 - 严肃、专业、可信、温暖纸面 -->
-    <!-- 主视觉方向：深蓝信任 + 橙色警示 + 安全绿 + 高级纸感 -->
+    <!-- 防诈课堂 v0.7.2 - 严肃、专业、可信、温暖纸面 -->
+    <!-- 主视觉：信任蓝（强调）+ 中性墨色（正文）+ 橙色警示 + 安全绿 + 高级纸感 -->
 
     <!-- 背景层级 -->
-    <color name="bg_page">#F8F6F2</color>
+    <color name="bg_page">#F7F5F1</color>
     <color name="bg_surface">#FFFFFF</color>
-    <color name="bg_elevated">#F1EDE6</color>
+    <color name="bg_elevated">#EFEBE4</color>
 
-
-    <!-- 文本层级 -->
-    <color name="text_primary">#0F172A</color>
-    <color name="text_secondary">#334155</color>
-    <color name="text_tertiary">#55667B</color>
+    <!-- 文本层级（中性墨色，避免通篇发蓝） -->
+    <color name="text_primary">#1A1D23</color>
+    <color name="text_secondary">#3B4351</color>
+    <color name="text_tertiary">#6B7686</color>
     <color name="text_on_brand">#FFFFFF</color>
 
-    <!-- 品牌主色（更深的信任蓝） -->
-    <color name="brand">#0F172A</color>
-
+    <!-- 品牌主色（清亮的信任蓝，用于图标/强调/进度） -->
+    <color name="brand">#1D4ED8</color>
     <color name="brand_muted">#475569</color>
-    <color name="brand_subtle">#E2E8F0</color>
+    <color name="brand_subtle">#E3ECFB</color>
 
     <!-- 警示色系 -->
     <color name="warning">#F59E0B</color>
-
     <color name="danger">#DC2626</color>
-
-
-
 
     <!-- 状态色 -->
     <color name="state_safe">#166534</color>
@@ -36,30 +30,30 @@
     <color name="state_rift">#4338CA</color>
 
     <!-- 水波纹 -->
-    <color name="ripple_surface">#1A0F172A</color>
-    <color name="ripple_brand">#220F172A</color>
+    <color name="ripple_surface">#141A1D23</color>
+    <color name="ripple_brand">#1F1D4ED8</color>
 
     <!-- 边框 -->
-    <color name="border_subtle">#E2E8F0</color>
-    <color name="border_strong">#CBD5E1</color>
+    <color name="border_subtle">#E4E0D8</color>
+    <color name="border_strong">#CDC7BB</color>
 
     <!-- 进度条 -->
-    <color name="progress_done">#0F172A</color>
+    <color name="progress_done">#1D4ED8</color>
     <color name="progress_current">#F59E0B</color>
-    <color name="progress_todo">#E2E8F0</color>
+    <color name="progress_todo">#D6D0C6</color>
 
-    <!-- 状态 container (修复 compile) -->
+    <!-- 状态 container -->
     <color name="state_naive">#0891B2</color>
     <color name="state_loss">#EA580C</color>
     <color name="state_safe_container">#DCFCE7</color>
     <color name="state_caution_container">#FEF3C7</color>
     <color name="state_critical_container">#FEE2E2</color>
     <color name="state_rift_container">#E0E7FF</color>
-    <color name="state_loss_container">#FFF7ED</color>
-    <color name="state_naive_container">#ECFEFF</color>
+    <color name="state_loss_container">#FFF1E6</color>
+    <color name="state_naive_container">#E0F7FB</color>
 
     <!-- 纸面细节 -->
-    <color name="surface_warm">#FDFCFA</color>
-    <color name="border_warm">#D8D2C8</color>
-    <color name="chapter_gradient_end">#D6DCE8</color>
+    <color name="surface_warm">#FDFBF7</color>
+    <color name="border_warm">#DED8CC</color>
+    <color name="chapter_gradient_end">#CBDBF7</color>
 </resources>

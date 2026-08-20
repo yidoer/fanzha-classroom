@@ -1,18 +1,17 @@
 .gradle/
 build/
-*.apk
 local.properties
 .idea/
 *.iml
-'app/build/'
-'app/release/'
-'build/'
-'*.apk'
-'!releases/*.apk'
-'!fanzha-classroom-*.apk'
+app/build/
+app/release/
 .claude/
 .gradle-home/
 .gradle-native/
 .gradle-runtime/
 .screenshots/
 story-pack.sha256
+
+# Keep only curated release APKs under releases/, ignore all other build APKs
+*.apk
+!releases/*.apk

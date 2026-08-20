@@ -137,11 +137,14 @@ public class StoryActivity extends AppCompatActivity {
         stepBar.removeAllViews();stepDots.clear();
         int shown=Math.max(projectedTotal,stepCount);
         for(int i=0;i<shown;i++){
+            boolean done=i<stepCount-1;
+            boolean current=i==stepCount-1;
             TextView dot=new TextView(this);
-            int size=dp(9);
-            int color = i<stepCount-1 ? c(R.color.progress_done)
-                    : i==stepCount-1 ? c(R.color.progress_current) : c(R.color.progress_todo);
-            dot.setBackgroundResource(R.drawable.bg_story_dot);
+            int size=current?dp(13):dp(9);
+            int color=done?c(R.color.progress_done)
+                    :current?c(R.color.progress_current):c(R.color.progress_todo);
+            dot.setBackgroundResource(current?R.drawable.bg_story_dot_current
+                    :done?R.drawable.bg_story_dot:R.drawable.bg_story_dot_todo);
             dot.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
             LinearLayout.LayoutParams dp2=new LinearLayout.LayoutParams(size,size);
             dp2.gravity=Gravity.CENTER_VERTICAL;
@@ -149,16 +152,15 @@ public class StoryActivity extends AppCompatActivity {
             stepBar.addView(dot);
             if(i<shown-1){
                 View line=new View(this);
-                boolean walked=i<stepCount-1;
-                line.setBackgroundColor(walked?c(R.color.progress_done):c(R.color.progress_todo));
-                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(16),dp(2));
+                line.setBackgroundColor(done?c(R.color.progress_done):c(R.color.progress_todo));
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(18),dp(2));
                 lp.gravity=Gravity.CENTER_VERTICAL;
-                lp.setMargins(dp(3),0,dp(3),0);
+                lp.setMargins(dp(4),0,dp(4),0);
                 line.setLayoutParams(lp);
                 stepBar.addView(line);
             }
         }
-    }
+        }
 
     private void render(){
         node=nodeMap.get(currentNodeId);
@@ -231,8 +233,8 @@ public class StoryActivity extends AppCompatActivity {
         debriefContainer.removeAllViews();
         projectedTotal=stepCount;renderStepBar();
         for(TextView dot:stepDots){
-            GradientDrawable bg=(GradientDrawable)dot.getBackground();
-            bg.setColor(c(R.color.progress_done));
+            dot.setBackgroundResource(R.drawable.bg_story_dot);
+            dot.setBackgroundTintList(android.content.res.ColorStateList.valueOf(c(R.color.progress_done)));
         }
         if(endingNode!=null)StoryProgress.markUnlocked(this,script.id,endingNode.id);
         String key=endingKey(endingNode);
