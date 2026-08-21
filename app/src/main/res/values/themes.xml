@@ -7,9 +7,9 @@
         <item name="colorError">@color/danger</item>
         <item name="colorSurface">@color/bg_surface</item>
         <item name="colorSurfaceVariant">@color/bg_elevated</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@color/surface_warm</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">@color/bg_surface</item>
+        <item name="android:navigationBarColor">@color/surface_warm</item>
         <item name="android:windowBackground">@color/bg_page</item>
         <item name="android:letterSpacing">0</item>
         <item name="shapeAppearanceCornerExtraSmall">@dimen/radius_card</item>
@@ -18,14 +18,14 @@
 
     <style name="NavButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_height">60dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">12sp</item>
-        <item name="android:paddingTop">2dp</item>
-        <item name="android:paddingBottom">2dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
         <item name="textAllCaps">false</item>
-        <item name="android:drawablePadding">4dp</item>
+        <item name="android:drawablePadding">2dp</item>
     </style>
 
 

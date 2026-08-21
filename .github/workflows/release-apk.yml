@@ -4,8 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version such as 0.7.1"
+        description: "Release version, must match app/build.gradle, such as 0.7.3"
         required: true
+      changelog:
+        description: "User-facing update summary"
+        required: true
+      prerelease:
+        description: "Publish as a prerelease"
+        required: true
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -13,27 +21,132 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: release-manifest
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
       - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
-      - name: Build debug APK
-        run: ./gradlew assembleDebug --no-daemon --console=plain
+      - name: Check requested version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          [[ "$REQUESTED_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+            echo "Version must use x.y.z"
+            exit 1
+          }
+          test "$GITHUB_REF" = "refs/heads/main" || {
+            echo "APK releases must be dispatched from main"
+            exit 1
+          }
+          APP_VERSION=$(sed -n "s/.*versionName[[:space:]]*['\"]\([^'\"]*\)['\"].*/\1/p" app/build.gradle | head -n 1)
+          APP_CODE=$(sed -n "s/.*versionCode[[:space:]]*\([0-9][0-9]*\).*/\1/p" app/build.gradle | head -n 1)
+          test -n "$APP_VERSION"
+          test -n "$APP_CODE"
+          test "$APP_VERSION" = "$REQUESTED_VERSION" || {
+            echo "Requested version $REQUESTED_VERSION does not match app version $APP_VERSION"
+            exit 1
+          }
+          git fetch origin main
+          git show origin/main:story-pack/manifest.json > current-release-manifest.json
+          PUBLISHED_CODE=$(node -p "require('./current-release-manifest.json').latestAppVersionCode")
+          PUBLISHED_VERSION=$(node -p "require('./current-release-manifest.json').latestAppVersionName")
+          test "$APP_CODE" -gt "$PUBLISHED_CODE" || {
+            echo "Android versionCode $APP_CODE must be greater than published versionCode $PUBLISHED_CODE ($PUBLISHED_VERSION)"
+            exit 1
+          }
+          if git ls-remote --exit-code --tags origin "refs/tags/app-v$REQUESTED_VERSION" >/dev/null 2>&1; then
+            echo "Tag app-v$REQUESTED_VERSION already exists"
+            exit 1
+          fi
+          node tools/validate_release_manifest.js current-release-manifest.json
+      - name: Validate stories
+        run: |
+          node tools/validate_story_pack.js app/src/main/assets/fraud_cases.json
+          node tools/validate_interactive_stories.js app/src/main/assets/interactive_stories.json
+      - name: Build and lint APK
+        run: bash ./gradlew assembleDebug lintDebug --no-daemon --console=plain
       - name: Prepare release assets
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_CHANGELOG: ${{ inputs.changelog }}
+          GITHUB_DOWNLOAD_PROXY: ${{ vars.GITHUB_DOWNLOAD_PROXY }}
         run: |
           mkdir -p releases
-          cp app/build/outputs/apk/debug/app-debug.apk releases/fanzha-classroom-${{ inputs.version }}-debug.apk
-          sha256sum releases/fanzha-classroom-${{ inputs.version }}-debug.apk | awk '{print $1}' > releases/fanzha-classroom-${{ inputs.version }}-debug.apk.sha256
-      - uses: softprops/action-gh-release@v2
+          APK="releases/fanzha-classroom-$RELEASE_VERSION-debug.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "$APK"
+          (cd releases && sha256sum "$(basename "$APK")" > "$(basename "$APK").sha256")
+          test -s "$APK"
+          (cd releases && sha256sum --check "$(basename "$APK").sha256")
+          APP_VERSION_CODE=$(sed -n "s/.*versionCode[[:space:]]*\([0-9][0-9]*\).*/\1/p" app/build.gradle | head -n 1)
+          APK_SHA256=$(cut -d ' ' -f 1 "$APK.sha256")
+          APP_VERSION_CODE="$APP_VERSION_CODE" APP_VERSION_NAME="$RELEASE_VERSION" APK_SHA256="$APK_SHA256" \
+            MANIFEST_SOURCE=current-release-manifest.json \
+            MANIFEST_OUTPUT=app-release-manifest.json node tools/update_release_manifest.js apk
+          node tools/validate_release_manifest.js app-release-manifest.json
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fanzha-classroom-${{ inputs.version }}-debug
+          path: |
+            releases/fanzha-classroom-${{ inputs.version }}-debug.apk
+            releases/fanzha-classroom-${{ inputs.version }}-debug.apk.sha256
+            app-release-manifest.json
+          if-no-files-found: error
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: app-v${{ inputs.version }}
-          name: FanZha Classroom v${{ inputs.version }}
+          name: 反诈课堂 v${{ inputs.version }}
+          prerelease: ${{ inputs.prerelease }}
+          fail_on_unmatched_files: true
           body: |
-            Automated debug APK build for v${{ inputs.version }}.
+            反诈课堂 v${{ inputs.version }} Android 测试版。
+
+            ${{ inputs.changelog }}
+
+            下载 APK 后可使用同名 `.sha256` 文件校验完整性。本版本发布前已通过剧情图校验、Android Lint 与 Debug APK 构建。
           files: |
             releases/fanzha-classroom-${{ inputs.version }}-debug.apk
             releases/fanzha-classroom-${{ inputs.version }}-debug.apk.sha256
+            app-release-manifest.json
+      - name: Publish update manifest to main
+        run: |
+          git fetch origin main
+          git checkout -B release-manifest-update origin/main
+          cp app-release-manifest.json story-pack/manifest.json
+          node tools/validate_release_manifest.js story-pack/manifest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add story-pack/manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish App update manifest v${{ inputs.version }}"
+            if ! git push origin "HEAD:main"; then
+              echo "::warning title=APK Release 已发布，更新清单未回写::分支保护阻止了 story-pack/manifest.json 回写。请从本次 Actions artifact 或 GitHub Release 下载 app-release-manifest.json，替换 story-pack/manifest.json 后提交到 main。"
+              {
+                echo "## 更新清单需要人工回写"
+                echo
+                echo "APK Release 和校验文件已经发布成功，但分支保护阻止了清单提交。"
+                echo "请下载本次产物中的 \`app-release-manifest.json\`，替换 \`story-pack/manifest.json\`，运行校验后提交："
+                echo
+                echo '```powershell'
+                echo 'Copy-Item app-release-manifest.json story-pack/manifest.json'
+                echo 'node tools/validate_release_manifest.js story-pack/manifest.json'
+                echo 'git add story-pack/manifest.json'
+                echo 'git commit -m "Publish App update manifest v${{ inputs.version }}"'
+                echo 'git push origin main'
+                echo '```'
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi

@@ -6,9 +6,6 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Locale;
@@ -107,12 +104,9 @@ public final class StoryPackUpdater {
     }
 
     private static Result updateOnce(Context context) throws Exception {
-        byte[] manifestBytes;
-        try { manifestBytes = download(BuildConfig.STORY_MANIFEST_URL); }
-        catch (Exception primary) {
-            if (BuildConfig.STORY_FALLBACK_MANIFEST_URL.trim().isEmpty()) throw primary;
-            manifestBytes = download(BuildConfig.STORY_FALLBACK_MANIFEST_URL);
-        }
+        byte[] manifestBytes = UpdateDownloadClient.downloadWithFallback(
+                new String[]{BuildConfig.STORY_MANIFEST_URL, BuildConfig.STORY_FALLBACK_MANIFEST_URL},
+                2 * 1024 * 1024, "application/json");
         JSONObject manifest = new JSONObject(new String(manifestBytes, StandardCharsets.UTF_8));
         int schema = manifest.getInt("schemaVersion");
         if (schema != PACK_SCHEMA && schema != 2) throw new IllegalArgumentException("不支持的剧情包格式");
@@ -122,7 +116,9 @@ public final class StoryPackUpdater {
         int localVersion = context.getSharedPreferences("story_pack", Context.MODE_PRIVATE).getInt("version", 1);
         if (remoteVersion <= localVersion) return new Result(false, "当前已是最新剧情包 v" + localVersion);
 
-        byte[] bytes = download(manifest.getString("downloadUrl"));
+        byte[] bytes = UpdateDownloadClient.downloadWithFallback(
+                UpdateDownloadClient.sources(manifest, "downloadUrls", "downloadUrl"),
+                5 * 1024 * 1024, "application/json");
         String expected = manifest.getString("sha256").toLowerCase(Locale.ROOT);
         if (!expected.equals(sha256(bytes))) throw new SecurityException("剧情包校验失败");
         validatePack(bytes, remoteVersion);
@@ -156,24 +152,6 @@ public final class StoryPackUpdater {
         }
         context.getSharedPreferences("story_pack", Context.MODE_PRIVATE).edit().putInt("version", remoteVersion).apply();
         return new Result(true, "剧情已更新至 v" + remoteVersion + "，重新进入故事即可体验");
-    }
-
-    private static byte[] download(String url) throws Exception {
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-        connection.setConnectTimeout(8000);
-        connection.setReadTimeout(12000);
-        connection.setRequestProperty("Accept", "application/json");
-        connection.setRequestProperty("User-Agent", "FanZha-Classroom/" + BuildConfig.VERSION_NAME);
-        int status = connection.getResponseCode();
-        if (status < 200 || status >= 300) throw new IllegalStateException("HTTP " + status);
-        try (InputStream input = connection.getInputStream(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[8192]; int read;
-            while ((read = input.read(buffer)) >= 0) {
-                output.write(buffer, 0, read);
-                if (output.size() > 5 * 1024 * 1024) throw new IllegalArgumentException("剧情包过大");
-            }
-            return output.toByteArray();
-        } finally { connection.disconnect(); }
     }
 
     private static void validatePack(byte[] bytes, int expectedVersion) throws Exception {

@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.button.MaterialButton;
@@ -101,9 +100,9 @@ public class StoryActivity extends AppCompatActivity {
     private void showJumpDialog(){
         List<StoryProgress.Checkpoint> saved=StoryProgress.checkpoints(this,script.id);
         if(saved.isEmpty()){
-            new AlertDialog.Builder(this).setTitle("进度跳转")
-                .setMessage("你还没有走过任何节点。先做出一次选择，之后就可以随时跳回来重走。")
-                .setPositiveButton("知道了",null).show();
+            WashiDialog.message(this,"进度跳转","尚无可用节点",
+                    "你还没有走过任何节点。先做出一次选择，之后就可以随时跳回来重走。",true,
+                    WashiDialog.Action.primary("知道了",null));
             return;
         }
         final List<StoryProgress.Checkpoint> options=new ArrayList<>(saved);
@@ -113,16 +112,15 @@ public class StoryActivity extends AppCompatActivity {
             StoryProgress.Checkpoint c=options.get(i);
             labels[i]="第 "+c.step+" 节 · "+c.chapter;
         }
-        new AlertDialog.Builder(this)
-            .setTitle("跳到走过的节点")
-            .setItems(labels,(d,which)->jumpTo(options.get(which)))
-            .setNegativeButton("取消",null).show();
+        WashiDialog.list(this,"跳到走过的节点","只显示已亲自抵达的进度",labels,
+                which->jumpTo(options.get(which)));
     }
 
     private void jumpTo(StoryProgress.Checkpoint c){
         if(!nodeMap.containsKey(c.nodeId)){
-            new AlertDialog.Builder(this).setMessage("这个节点在新版剧情里已经改写，无法跳转。")
-                .setPositiveButton("知道了",null).show();
+            WashiDialog.message(this,"无法跳转","剧情版本已经变化",
+                    "这个节点在新版剧情里已经改写。旧进度仍会保留，但不能直接跳入不存在的节点。",true,
+                    WashiDialog.Action.primary("知道了",null));
             return;
         }
         currentNodeId=c.nodeId;
@@ -239,27 +237,28 @@ public class StoryActivity extends AppCompatActivity {
         if(endingNode!=null)StoryProgress.markUnlocked(this,script.id,endingNode.id);
         String key=endingKey(endingNode);
         StoryScript.Ending ending=script.ending(key);
+        String tone=ending.tone.isEmpty()?key:ending.tone;
         stageLabel.setText(getString(R.string.story_stage_ending_fmt,stepCount));
 
         LinearLayout banner=new LinearLayout(this);
         banner.setOrientation(LinearLayout.VERTICAL);banner.setGravity(Gravity.CENTER);
         banner.setPadding(0,dp(14),0,dp(20));
         ImageView mark=new ImageView(this);
-        mark.setImageResource(outcomeIcon(key));
-        mark.setImageTintList(android.content.res.ColorStateList.valueOf(c(outcomeColor(key))));
+        mark.setImageResource(outcomeIcon(tone));
+        mark.setImageTintList(android.content.res.ColorStateList.valueOf(c(outcomeColor(tone))));
         GradientDrawable disc=new GradientDrawable();
-        disc.setShape(GradientDrawable.OVAL);disc.setColor(c(outcomeContainer(key)));
+        disc.setShape(GradientDrawable.OVAL);disc.setColor(c(outcomeContainer(tone)));
         mark.setBackground(disc);mark.setPadding(dp(16),dp(16),dp(16),dp(16));
         LinearLayout.LayoutParams mp=new LinearLayout.LayoutParams(dp(72),dp(72));
         mark.setLayoutParams(mp);
-        mark.setContentDescription(outcomeLabel(key));
+        mark.setContentDescription(outcomeLabel(tone));
         banner.addView(mark);
         TextView badge=new TextView(this);
-        badge.setText(outcomeLabel(key));badge.setTextSize(13);
+        badge.setText(outcomeLabel(tone));badge.setTextSize(13);
         badge.setTypeface(null,Typeface.BOLD);
-        badge.setTextColor(c(outcomeColor(key)));
+        badge.setTextColor(c(outcomeColor(tone)));
         GradientDrawable pill=new GradientDrawable();
-        pill.setCornerRadius(dp(999));pill.setColor(c(outcomeContainer(key)));
+        pill.setCornerRadius(dp(999));pill.setColor(c(outcomeContainer(tone)));
         badge.setBackground(pill);badge.setPadding(dp(12),dp(5),dp(12),dp(5));
         LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -305,7 +304,7 @@ public class StoryActivity extends AppCompatActivity {
         statsRow.addView(statChip("关系",relationship));
         statsRow.addView(statChip("证据",evidence));
         statsRow.addView(statChip("暴露",exposure));
-        statsRow.addView(statChip("损失 ¥"+loss,-1));
+        statsRow.addView(statChip(script.scam?"涉险金额 ¥"+loss:"资金往来 ¥"+loss,-1));
         debriefContainer.addView(statsRow);
 
         TextView source=new TextView(this);
@@ -368,6 +367,7 @@ public class StoryActivity extends AppCompatActivity {
     /** Ending node id decides the summary; stats are only the fallback. */
     private String endingKey(StoryScript.Node endingNode){
         if(endingNode!=null){
+            if(!endingNode.endingKey.isEmpty())return endingNode.endingKey;
             String id=endingNode.id;
             if(id.contains("ending_good"))return "best";
             if(id.contains("ending_exposed"))return "exposed";

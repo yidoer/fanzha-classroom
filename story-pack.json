@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "meta": {
     "schemaVersion": 2,
-    "packVersion": 3,
+    "packVersion": 4,
     "minAppVersionCode": 7
   },
   "cases": [
@@ -875,7 +875,7 @@
             {
               "id": "n1a",
               "label": "挂断，打开购物App自己联系官方客服",
-              "nextNode": "ending_good",
+              "nextNode": "n1a_confirm",
               "effects": {
                 "relationship": -1,
                 "evidence": 3,
@@ -883,7 +883,7 @@
                 "loss": 0
               },
               "feedbackTitle": "你在第一步就切断了骗局",
-              "feedback": "官方客服确认该批次没有召回通知。你用了不到两分钟，零损失。记住这种感觉：独立核验不需要勇气，只需要一次回拨。"
+              "feedback": "你挂断了电话，然后打开购物App寻找官方客服入口。这是正确的选择——验证的方向对了，现在要看你怎么收尾。"
             },
             {
               "id": "n1b",
@@ -910,6 +910,53 @@
               },
               "feedbackTitle": "准确的信息不等于真实的身份",
               "feedback": "快递面单、数据泄露和内鬼都可能流出这些信息。你暂时没有损失，但已经走进了对方设计的信息闭环。"
+            }
+          ]
+        },
+        {
+          "id": "n1a_confirm",
+          "chapter": "验证结果",
+          "scene": "你在购物App里找到了官方客服入口，拨通了电话。客服查询后告诉你：该批次没有任何召回通知，也没有重金属检测问题，更没有主动联系买家的服务。你问：刚才那个电话是谁打来的？客服说：可能是骗局，建议您不要回拨那个号码。你放下电话，心跳还没完全平复。",
+          "prompt": "客服已经确认——那通电话是骗局。但你还有最后一件事需要决定：",
+          "choices": [
+            {
+              "id": "n1a_c1",
+              "label": "把这件事发到家庭群提醒家人",
+              "nextNode": "ending_family_guard",
+              "effects": {
+                "relationship": 2,
+                "evidence": 4,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "你把防护网撑大了一圈",
+              "feedback": "你截了一张截图发到群里，写了几行字说明。妈妈回复说：好险，我昨天也接到了类似的电话。你的一条消息可能保护了不止一个人。"
+            },
+            {
+              "id": "n1a_c2",
+              "label": "把那个号码举报给12321网络不良信息举报平台",
+              "nextNode": "ending_public_report",
+              "effects": {
+                "relationship": 1,
+                "evidence": 4,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "你用正确的方式结束了这件事",
+              "feedback": "你打开12321举报平台，填写了号码、来电内容和时间。系统显示这个号码已被其他用户举报过17次。你的举报会帮助运营商更快封停这个号码。"
+            },
+            {
+              "id": "n1a_c3",
+              "label": "确认没有损失，直接删掉那个号码，继续今晚的事",
+              "nextNode": "ending_private_exit",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "你全身而退，但没有让这份经历发挥更多价值",
+              "feedback": "你没有损失，这很好。但骗子的号码还在运转，下一个接到这通电话的人可能没有你这么警觉。举报一个号码只需要三分钟。"
             }
           ]
         },
@@ -1149,6 +1196,27 @@
           ]
         },
         {
+          "id": "ending_family_guard",
+          "endingKey": "family_guard",
+          "chapter": "结局·家庭防线",
+          "scene": "你把完整过程发进家庭群：不要回拨陌生号码、退款只走平台内入口。表妹刚好收到同类电话，照着你的截图核验后挂断。你没有只救下自己，也让骗子少了一次可乘之机。",
+          "choices": []
+        },
+        {
+          "id": "ending_public_report",
+          "endingKey": "public_report",
+          "chapter": "结局·留下记录",
+          "scene": "你把号码、短信链接和通话时间提交到举报平台。它未必马上换来回音，却让这条线索进入拦截系统；下一次有人搜到这个号码时，可能会因此多停三十秒。",
+          "choices": []
+        },
+        {
+          "id": "ending_private_exit",
+          "endingKey": "private_exit",
+          "chapter": "结局·独自离场",
+          "scene": "你删掉号码，继续过自己的夜晚。损失是零，但泄露的订单信息仍在流转，同一套话术还会拨向下一位正在犹豫的人。自保没有错，留下线索能让防线更完整。",
+          "choices": []
+        },
+        {
           "id": "ending_good",
           "chapter": "结局",
           "scene": "",
@@ -1252,6 +1320,21 @@
         "default": {
           "title": "故事结束",
           "body": "每一次选择都把你带到了这里。回顾你的路径，找到最早可以停下的那个节点——那就是你下次会赢的地方。"
+        },
+        "family_guard": {
+          "title": "你把防线延伸到了家里",
+          "body": "独立核验守住了你的钱；把经过讲清楚，又让家人拥有了同一套可执行的判断方法。提醒不是制造恐慌，而是把信息差补齐。",
+          "tone": "best"
+        },
+        "public_report": {
+          "title": "你留下了一条可用的线索",
+          "body": "举报不保证立刻抓到人，却能为平台拦截、号码标记和后续侦查补上一块拼图。你把一次险情变成了公共防线的一部分。",
+          "tone": "best"
+        },
+        "private_exit": {
+          "title": "你安全离场，也留下一个缺口",
+          "body": "你做对了最重要的事：没有把判断权交给陌生人。删除号码足以保护当下；保存证据、举报或提醒身边人，能让这次识破产生更远的价值。",
+          "tone": "exposed"
         }
       }
     },
@@ -1280,7 +1363,7 @@
             {
               "id": "c1a",
               "label": "用搜索引擎反向搜索她的头像",
-              "nextNode": "ending_good",
+              "nextNode": "c1a_after",
               "effects": {
                 "relationship": -1,
                 "evidence": 3,
@@ -1580,6 +1663,53 @@
           "scene": "你没有付出一分钱，但你确实交出过一段真心。对方消失得干净利落，连头像都换掉了。被识破的骗局不会道别——它只会换一个名字重新开始。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "c1a_after",
+          "chapter": "照片拆穿之后",
+          "scene": "反向搜索发现头像属于陌生博主。聊天截图、原帖链接和账号信息都在你手里，对方却开始更换头像。",
+          "prompt": "你要怎样处理这份证据？",
+          "choices": [
+            {
+              "id": "c1a_after_1",
+              "label": "留证并举报账号",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "证据留下来了",
+              "feedback": "你提交原帖、聊天时间线和账号，平台封禁了整批账号，警方也联系你补充线索。"
+            },
+            {
+              "id": "c1a_after_2",
+              "label": "只拉黑，不再追究",
+              "nextNode": "ending_partial",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "你保住了自己",
+              "feedback": "你没有损失钱，但账号换张照片后又回到群里。抽身是止损，举报才是关掉入口。"
+            },
+            {
+              "id": "c1a_after_3",
+              "label": "发回去质问她",
+              "nextNode": "ending_exposed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "最后一次套话",
+              "feedback": "她顺势问出你的城市和常用平台后删号。骗局被看穿了，但新的个人线索也被送了出去。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -1640,7 +1770,7 @@
             {
               "id": "d1a",
               "label": "退出会议，通过内部通讯系统给CFO打电话确认",
-              "nextNode": "ending_good",
+              "nextNode": "d1a_after",
               "effects": {
                 "relationship": 0,
                 "evidence": 3,
@@ -1893,6 +2023,53 @@
           "scene": "转账被拦下了，但那场会议里你说过的账户结构、审批层级、经办人姓名，已经全部落进了对方的资料库。下一次他们会更像。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "d1a_after",
+          "chapter": "电话确认之后",
+          "scene": "真正的CFO确认没有发起会议。IT发现链接来自刚注册的域名，录屏里还残留项目名称和参会名单。",
+          "prompt": "转账被阻止后，你怎样完成团队止损？",
+          "choices": [
+            {
+              "id": "d1a_after_1",
+              "label": "保留录屏并通知IT与法务",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "修补入口",
+              "feedback": "法务封存邮件头和录屏，IT重置会议账号并排查链接，公司新增了双人复核。"
+            },
+            {
+              "id": "d1a_after_2",
+              "label": "删除邀请，不再声张",
+              "nextNode": "ending_partial",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "第一枚雷之外",
+              "feedback": "同一邀请仍躺在同事日历里，第二天有人再次点开。个人安全了，团队风险还在。"
+            },
+            {
+              "id": "d1a_after_3",
+              "label": "把未打码录屏发外部群求证",
+              "nextNode": "ending_exposed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "内部信息外泄",
+              "feedback": "群友看出画面异常，但项目金额、姓名和链接也被更多人看到，骗子获得了下一轮社工素材。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -1953,7 +2130,7 @@
             {
               "id": "p1a",
               "label": "不点链接，直接打开ETC官方App查询",
-              "nextNode": "ending_good",
+              "nextNode": "p1a_after",
               "effects": {
                 "relationship": 0,
                 "evidence": 3,
@@ -2206,6 +2383,53 @@
           "scene": "你一次都没有点开那个链接。可对方知道你昨天走过高速——这说明你的号码和行程已经在别人的表格里。防住这一条，不等于把名单删掉。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "p1a_after",
+          "chapter": "官方App之后",
+          "scene": "官方App显示账户正常，短信域名只多了一个字母。你保留了短信、号码和链接截图。",
+          "prompt": "怎样让这条线索帮助别人？",
+          "choices": [
+            {
+              "id": "p1a_after_1",
+              "label": "提交截图并举报号码",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "骚扰变成情报",
+              "feedback": "平台依据完整证据拦截同批号码，运营商也开始追查发送源。"
+            },
+            {
+              "id": "p1a_after_2",
+              "label": "删除短信，提醒自己注意",
+              "nextNode": "ending_partial",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "样本消失了",
+              "feedback": "账户没受影响，但没有样本，平台很难判断它和其他短信属于同一团伙。"
+            },
+            {
+              "id": "p1a_after_3",
+              "label": "把原图发公开群求辨认",
+              "nextNode": "ending_exposed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "行程线索暴露",
+              "feedback": "大家看出假域名，可截图同时暴露车牌尾号和出行时间。识破不等于可以忽略隐私。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -2266,7 +2490,7 @@
             {
               "id": "r1a",
               "label": "坚持实地看房后再付款，把房源发给本地朋友帮忙先看一下",
-              "nextNode": "ending_good",
+              "nextNode": "r1a_after",
               "effects": {
                 "relationship": 1,
                 "evidence": 3,
@@ -2360,7 +2584,7 @@
             {
               "id": "r2a_1",
               "label": "直接到派出所报案，把聊天记录和转账凭证交给警方",
-              "nextNode": "ending_partial",
+              "nextNode": "ending_rental_recovered",
               "effects": {
                 "relationship": 0,
                 "evidence": 2,
@@ -2373,7 +2597,7 @@
             {
               "id": "r2a_2",
               "label": "威胁对方如果不退钱就报警",
-              "nextNode": "ending_partial",
+              "nextNode": "ending_rental_half",
               "effects": {
                 "relationship": 0,
                 "evidence": 1,
@@ -2386,7 +2610,7 @@
             {
               "id": "r2a_3",
               "label": "算了，两千块就当交学费，删掉联系人重新找房",
-              "nextNode": "ending_partial",
+              "nextNode": "ending_rental_silent",
               "effects": {
                 "relationship": 0,
                 "evidence": 0,
@@ -2454,7 +2678,7 @@
             {
               "id": "r4a",
               "label": "停止一切私下追款行为，立即报警",
-              "nextNode": "ending_major",
+              "nextNode": "ending_rental_case",
               "effects": {
                 "relationship": 0,
                 "evidence": 3,
@@ -2480,7 +2704,7 @@
             {
               "id": "r4c",
               "label": "放弃追款，把全部精力放在找新房子上",
-              "nextNode": "ending_major",
+              "nextNode": "ending_rental_walkaway",
               "effects": {
                 "relationship": 0,
                 "evidence": 1,
@@ -2491,6 +2715,46 @@
               "feedback": "一万七千元的教训沉重。你没有报警，但你决定把注意力放在重建生活上。虽然骗子逍遥法外，但你没有再为他多浪费一分钱一分钟。"
             }
           ]
+        },
+        {
+          "id": "ending_rental_recovered",
+          "endingKey": "rental_recovered",
+          "chapter": "结局·账户冻结",
+          "scene": "你没有继续和假房东拉扯，而是把时间线、付款凭证和账号一次性交给警方。收款账户及时被冻结，两千元仍需等待程序返还，但证据链已经进入正式渠道。你失去的是入住机会，不是继续止损的主动权。",
+          "prompt": "",
+          "choices": []
+        },
+        {
+          "id": "ending_rental_half",
+          "endingKey": "rental_half",
+          "chapter": "结局·只退一半",
+          "scene": "骗子用退回一千元换取你的沉默，也借机确认你更在意尽快结束，而不是追究到底。你拿回了一半，却失去了冻结账户的最佳时间。妥协减少了眼前损失，也让证据和其他受害者一起继续沉下去。",
+          "prompt": "",
+          "choices": []
+        },
+        {
+          "id": "ending_rental_silent",
+          "endingKey": "rental_silent",
+          "chapter": "结局·无人报案",
+          "scene": "两千元被你记作学费，生活很快恢复正常。几个月后你在本地新闻里看到同一套房源又骗了十几个人。放下损失没有错，但删除全部记录，也意味着这条线索从你的手里彻底消失。",
+          "prompt": "",
+          "choices": []
+        },
+        {
+          "id": "ending_rental_case",
+          "endingKey": "rental_case",
+          "chapter": "结局·两案并线",
+          "scene": "第一次诈骗让你损失租金，第二次诈骗利用你急于追回的心理继续收割。你最终报警，警方把两个收款子账号并入同一条资金链。钱未必能全回来，但你提供的时间线让一起孤立报案变成了可追查的团伙案件。",
+          "prompt": "",
+          "choices": []
+        },
+        {
+          "id": "ending_rental_walkaway",
+          "endingKey": "rental_walkaway",
+          "chapter": "结局·停止追款",
+          "scene": "你终于拒绝再向任何陌生追款人付费，也找到了新住处。但没有报案和保留证据，意味着一万七千元几乎失去追回机会。停止追加投入是正确止损，止损之后仍应把线索交给真正有权限调查的人。",
+          "prompt": "",
+          "choices": []
         },
         {
           "id": "ending_good",
@@ -2566,6 +2830,53 @@
           "scene": "你的两千块没有转出去。但你的手机号被标注为“正在找房、预算充足”，转手给了下一个假房东。低价房源的推送还会再来几次。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "r1a_after",
+          "chapter": "房源核查之后",
+          "scene": "物业确认照片盗自另一栋楼，所谓房东也不是登记业主；平台上还有十几套相似低价房。",
+          "prompt": "你会如何处理仍在诱骗别人的账号？",
+          "choices": [
+            {
+              "id": "r1a_after_1",
+              "label": "提交物业证明和聊天记录",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "房源成了案源",
+              "feedback": "平台下架整批房源，警方根据收款账户串起发布者。"
+            },
+            {
+              "id": "r1a_after_2",
+              "label": "只拉黑，继续找房",
+              "nextNode": "ending_partial",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "低价房还在",
+              "feedback": "骗子换号继续发布，下一位租客更容易相信“今天不付就没了”。"
+            },
+            {
+              "id": "r1a_after_3",
+              "label": "质问并透露朋友看房信息",
+              "nextNode": "ending_exposed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "套话换了目标",
+              "feedback": "他假装道歉，转而追问你朋友的小区和看房时间，假房源变成了社工入口。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -2579,6 +2890,31 @@
         "骗子失联或受害者遭遇二次诈骗"
       ],
       "endings": {
+        "rental_recovered": {
+          "title": "正式渠道接住了证据",
+          "body": "你没有把报警当作一句威胁，而是让付款记录真正进入冻结和侦查流程。",
+          "tone": "partial_loss"
+        },
+        "rental_half": {
+          "title": "拿回一半，也错过一半",
+          "body": "骗子用部分退款买走了时间；止损有效，但追责窗口正在关闭。",
+          "tone": "partial_loss"
+        },
+        "rental_silent": {
+          "title": "你离开了，房源还在",
+          "body": "放下损失保护了生活，却没有阻止同一套剧本继续寻找下一位租客。",
+          "tone": "partial_loss"
+        },
+        "rental_case": {
+          "title": "第二个坑成为第一条线索",
+          "body": "二次诈骗加重了损失，但及时报案让两个假身份暴露在同一条资金链上。",
+          "tone": "major_loss"
+        },
+        "rental_walkaway": {
+          "title": "止住了钱，没有留下案卷",
+          "body": "你停止追加投入，却也放弃了追查；真正完整的止损还包括保存证据和报案。",
+          "tone": "major_loss"
+        },
         "best": {
           "title": "一眼识破",
           "body": "照片很美，但你没有为不存在的东西付钱。"
@@ -2626,7 +2962,7 @@
             {
               "id": "j1a",
               "label": "搜索刷单诈骗案例，先看看有没有风险",
-              "nextNode": "ending_good",
+              "nextNode": "j1a_after",
               "effects": {
                 "relationship": 0,
                 "evidence": 3,
@@ -2879,6 +3215,53 @@
           "scene": "你把规则反过来讲了一遍，他们立刻放弃了你。刷单团伙不需要说服每一个人，他们只需要人群里最急的那几个。你不在那几个里面。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "j1a_after",
+          "chapter": "搜索结果之后",
+          "scene": "反诈中心案例显示这个群使用固定的首单返现话术，截图还带着相同的压缩痕迹。",
+          "prompt": "你没有下单，怎样让线索停止扩散？",
+          "choices": [
+            {
+              "id": "j1a_after_1",
+              "label": "保存群聊并举报广告账号",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "诱饵变成证据",
+              "feedback": "平台依据群聊、收款码和广告链接封禁多个账号，调查继续追资金链。"
+            },
+            {
+              "id": "j1a_after_2",
+              "label": "退出群聊，假装没看见",
+              "nextNode": "ending_partial",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "群聊继续招人",
+              "feedback": "群里又进来一批求职者，沉默让诱饵继续显得“有人成功”。"
+            },
+            {
+              "id": "j1a_after_3",
+              "label": "把群二维码发给朋友看看",
+              "nextNode": "ending_exposed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "暴露面扩大",
+              "feedback": "朋友被私聊，客服顺着二维码确认了你们的社交关系。你没付款，却扩大了暴露面。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -2939,7 +3322,7 @@
             {
               "id": "i1a",
               "label": "帮妈妈查一下这个平台的银保监会备案号",
-              "nextNode": "ending_good",
+              "nextNode": "i1a_after",
               "effects": {
                 "relationship": 1,
                 "evidence": 3,
@@ -3127,7 +3510,7 @@
             {
               "id": "i5a",
               "label": "陪妈妈去派出所报案，带上所有记录",
-              "nextNode": "ending_major",
+              "nextNode": "ending_ponzi_report",
               "effects": {
                 "relationship": 3,
                 "evidence": 3,
@@ -3140,7 +3523,7 @@
             {
               "id": "i5b",
               "label": "在网上帮妈妈找追款途径，联系媒体曝光",
-              "nextNode": "ending_major",
+              "nextNode": "ending_ponzi_exposure",
               "effects": {
                 "relationship": 2,
                 "evidence": 2,
@@ -3153,7 +3536,7 @@
             {
               "id": "i5c",
               "label": "帮妈妈瞒着爸爸，自己垫钱补上缺口",
-              "nextNode": "ending_major",
+              "nextNode": "ending_ponzi_coverup",
               "effects": {
                 "relationship": 3,
                 "evidence": 0,
@@ -3166,6 +3549,30 @@
           ]
         },
         {
+          "id": "ending_ponzi_report",
+          "endingKey": "ponzi_report",
+          "chapter": "结局·一起报案",
+          "scene": "二十万元没有凭空回来，报案回执也不是一张赎回券。但你陪妈妈把转账、群聊、讲师身份和每次返息整理成完整时间线。她第一次不再重复“利息是真的”，而是承认那些利息只是从后来者本金里切出的一小块诱饵。",
+          "prompt": "",
+          "choices": []
+        },
+        {
+          "id": "ending_ponzi_exposure",
+          "endingKey": "ponzi_exposure",
+          "chapter": "结局·报道之后",
+          "scene": "媒体报道让更多家庭认出了同一套养老理财话术，专案组也因此收到更多线索。但曝光不能替代报案：你随后仍需带妈妈完成登记。公共提醒扩大了止损范围，个人证据才决定她能否进入追赃名单。",
+          "prompt": "",
+          "choices": []
+        },
+        {
+          "id": "ending_ponzi_coverup",
+          "endingKey": "ponzi_coverup",
+          "chapter": "结局·秘密缺口",
+          "scene": "你用自己的积蓄补上二十万元，家里的账面恢复平静，骗局却被包装成一次从未发生的失误。妈妈没有参与报案，也没有真正看懂资金盘；几个月后，另一个群聊又向她发来“内部债权转让”。你补的是数字，没有补上判断。",
+          "prompt": "",
+          "choices": []
+        },
+        {
           "id": "ending_good",
           "chapter": "结局·守住了妈妈的养老钱",
           "scene": "你用耐心和证据保护了妈妈一辈子的积蓄。你给妈妈的不只是一个提醒——更是陪她一起面对真相的勇气。",
@@ -3176,13 +3583,6 @@
           "id": "ending_partial",
           "chapter": "结局·小额损失",
           "scene": "两万块打了水漂，但妈妈的二十万大头保住了。你学会了如何在尊重和警惕之间找到平衡。",
-          "prompt": "",
-          "choices": []
-        },
-        {
-          "id": "ending_major",
-          "chapter": "结局·二十万不见了",
-          "scene": "妈妈的养老钱消失在了一个不存在App里。但比起钱，更重要的是——她还有你。钱可以慢慢再攒，信任可以慢慢重建。",
           "prompt": "",
           "choices": []
         },
@@ -3239,6 +3639,53 @@
           "scene": "那二十万还在妈妈的账户上。可餐桌上关于钱的话题从此消失了——她怕再被否定一次。守住了钱，也要记得把商量的门重新推开。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "i1a_after",
+          "chapter": "备案查询之后",
+          "scene": "官网返回“无此备案信息”。宣传册、公章和收款二维码仍在妈妈手里，讲座群却催她今晚完成名额登记。",
+          "prompt": "事实已经查到，怎样把它变成不伤人的行动？",
+          "choices": [
+            {
+              "id": "i1a_after_1",
+              "label": "陪妈妈留证并向警方咨询",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "共同面对真相",
+              "feedback": "你们一起整理宣传册、转账要求和讲座地址。妈妈没有投钱，还主动劝住了同桌的阿姨。"
+            },
+            {
+              "id": "i1a_after_2",
+              "label": "只发备案截图，之后不再过问",
+              "nextNode": "ending_partial",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "证据缺少陪伴",
+              "feedback": "妈妈暂时没转钱，但讲师改用“亲友名额”催促她。没有持续沟通，事实被新的热情盖住。"
+            },
+            {
+              "id": "i1a_after_3",
+              "label": "发到家庭群让亲戚评理",
+              "nextNode": "ending_exposed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "体面先被拿走",
+              "feedback": "亲戚们轮番评论，妈妈把群设成免打扰。钱暂时守住了，可她以后不再告诉你投资决定。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -3252,6 +3699,21 @@
         "警方介入调查，追索困难重重"
       ],
       "endings": {
+        "ponzi_report": {
+          "title": "损失进入了证据链",
+          "body": "钱未必能立刻追回，但妈妈不必独自背着羞耻，案件也不再只存在于一个关闭的群聊里。",
+          "tone": "major_loss"
+        },
+        "ponzi_exposure": {
+          "title": "一个家庭的损失变成预警",
+          "body": "报道让更多人停下，但个人追赃仍要靠正式报案和完整凭证。",
+          "tone": "major_loss"
+        },
+        "ponzi_coverup": {
+          "title": "钱补上了，骗局没有被说破",
+          "body": "隐瞒保护了妈妈一时的体面，也让同一套诱饵保留了再次生效的机会。",
+          "tone": "major_loss"
+        },
         "best": {
           "title": "守住了防线",
           "body": "妈妈的钱还在，你的耐心也得到了回报。"
@@ -3263,10 +3725,6 @@
         "partial_loss": {
           "title": "有惊无险",
           "body": "发现了真相，只损失了皮毛。"
-        },
-        "major_loss": {
-          "title": "血本无归",
-          "body": "骗子带走的不只是钱，还有老人对世界的信任。"
         },
         "default": {
           "title": "落幕",
@@ -3299,7 +3757,7 @@
             {
               "id": "a1a",
               "label": "保持通话，用另一部手机给女儿打电话",
-              "nextNode": "ending_good",
+              "nextNode": "a1a_after",
               "effects": {
                 "relationship": 0,
                 "evidence": 3,
@@ -3440,7 +3898,7 @@
             {
               "id": "a4a",
               "label": "挂断电话，直接去女儿学校接她回家",
-              "nextNode": "ending_major",
+              "nextNode": "ending_voice_rebuild",
               "effects": {
                 "relationship": 2,
                 "evidence": 1,
@@ -3466,7 +3924,7 @@
             {
               "id": "a4c",
               "label": "把骗子的电话转给警方，配合警方做诱捕",
-              "nextNode": "ending_major",
+              "nextNode": "ending_voice_counterstrike",
               "effects": {
                 "relationship": 0,
                 "evidence": 4,
@@ -3477,6 +3935,22 @@
               "feedback": "警方让你继续保持通话，通过技术手段追踪信号源。虽然二十万不一定能追回，但你的配合让警方锁定了嫌疑人位置。你失去了一笔钱，但让一个团伙付出了代价。"
             }
           ]
+        },
+        {
+          "id": "ending_voice_rebuild",
+          "endingKey": "voice_rebuild",
+          "chapter": "结局·真实拥抱",
+          "scene": "二十万元已经转走，但你没有让第二次勒索继续。你亲眼见到女儿，和她一起修改社交平台隐私设置、约定家庭口令，也把那段克隆语音交给警方。损失没有被轻描淡写，恐惧却不再替你做下一次决定。",
+          "prompt": "",
+          "choices": []
+        },
+        {
+          "id": "ending_voice_counterstrike",
+          "endingKey": "voice_counterstrike",
+          "chapter": "结局·反向取证",
+          "scene": "你在警方指导下延长通话，保留收款账户、话术切换和线路信息。二十万元仍在追查，但团伙的一处设备窝点因此暴露。配合调查不是电影式反击，而是把对方最依赖的匿名和时间优势一点点拿走。",
+          "prompt": "",
+          "choices": []
         },
         {
           "id": "ending_good",
@@ -3552,6 +4026,53 @@
           "scene": "女儿在教室里，一切正常。你的钱一分没动，但那三秒被录走的语音还在别人的模型里。它会被用在别人身上，也可能再一次用在你身上。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "a1a_after",
+          "chapter": "女儿接通之后",
+          "scene": "女儿在图书馆接起另一部手机，确认自己安全。原通话里仍有合成哭声，来电号码和转账账户也完整保留。",
+          "prompt": "恐惧解除后，你怎样保护下一位接听者？",
+          "choices": [
+            {
+              "id": "a1a_after_1",
+              "label": "把录音线索交给警方并提醒家人",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "冷静争取了时间",
+              "feedback": "警方确认哭声来自女儿公开视频的二次合成。家人还约定了安全口令和独立回拨流程。"
+            },
+            {
+              "id": "a1a_after_2",
+              "label": "删掉记录，庆幸女儿没事",
+              "nextNode": "ending_partial",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "危险去了下一部手机",
+              "feedback": "你没有损失钱，但号码和音频仍在团伙手里。没有报案，他们会换一个家庭继续试。"
+            },
+            {
+              "id": "a1a_after_3",
+              "label": "公开发布原始哭声提醒大家",
+              "nextNode": "ending_exposed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "提醒带出了声音样本",
+              "feedback": "网友识别出AI合成；与此同时，公开音频也成了别人训练语音模型的新素材。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -3566,6 +4087,16 @@
         "警方介入追踪资金和信号源"
       ],
       "endings": {
+        "voice_rebuild": {
+          "title": "损失之后，恐惧没有继续收款",
+          "body": "你用真实见面结束了二次勒索，也为下一次深度伪造建立了家庭验证规则。",
+          "tone": "major_loss"
+        },
+        "voice_counterstrike": {
+          "title": "通话变成了证据",
+          "body": "钱仍需追查，但对方的线路、账户和话术第一次不再只掌握在骗子手里。",
+          "tone": "major_loss"
+        },
         "best": {
           "title": "理智战胜恐惧",
           "body": "你用了三十秒来验证，省了二十年去遗憾。"
@@ -3613,7 +4144,7 @@
             {
               "id": "f1a",
               "label": "语气温和地问医院和主治医生，说帮他查缴费流程",
-              "nextNode": "ending_good",
+              "nextNode": "f1a_after",
               "effects": {
                 "relationship": 1,
                 "evidence": 3,
@@ -3754,7 +4285,7 @@
             {
               "id": "f2a_1",
               "label": "向阿杰坦承当时是因为反诈意识太强才犹豫的",
-              "nextNode": "ending_mixed",
+              "nextNode": "ending_friend_repaired",
               "effects": {
                 "relationship": 3,
                 "evidence": 2,
@@ -3780,7 +4311,7 @@
             {
               "id": "f2a_3",
               "label": "为之前的态度向阿杰道歉，说以后有需要随时开口",
-              "nextNode": "ending_mixed",
+              "nextNode": "ending_friend_apology",
               "effects": {
                 "relationship": 2,
                 "evidence": 1,
@@ -3791,6 +4322,22 @@
               "feedback": "阿杰接受了你的道歉。他说他知道现在的社会让人不得不小心。你们的友谊翻过了这一页，但你心里知道——那一夜你挂断电话时的语气，他可能永远不会忘记。"
             }
           ]
+        },
+        {
+          "id": "ending_friend_repaired",
+          "endingKey": "friend_repaired",
+          "chapter": "结局·把话说开",
+          "scene": "你没有用“反诈都是为你好”替自己的冷淡开脱，而是承认当晚把核验做成了拒绝。阿杰也说出自己最难受的不是借不到钱，而是你连一句“我陪你想办法”都没有留下。误会被拆开后，你们共同约定：以后紧急求助先提供可核验信息，也先给彼此一句回应。",
+          "prompt": "",
+          "choices": []
+        },
+        {
+          "id": "ending_friend_apology",
+          "endingKey": "friend_apology",
+          "chapter": "结局·承诺太满",
+          "scene": "你的道歉是真诚的，阿杰也接受了。但“以后有需要随时开口”把边界说得过满：真正成熟的帮助不是取消核验，而是明确自己能做什么、多久能做到。友谊修复了，你们还需要学会让善意可持续。",
+          "prompt": "",
+          "choices": []
         },
         {
           "id": "ending_good",
@@ -3819,6 +4366,53 @@
           "scene": "你的关系经历了一次颠簸，但你们都是成熟的人。友谊还在，但那道裂痕提醒着你们：信任需要维护，也需要验证。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "f1a_after",
+          "chapter": "医院确认之后",
+          "scene": "急诊科确认阿杰母亲确实在抢救，医院公众号也显示缴费入口。阿杰说任何方式都可以，只要先补上押金。",
+          "prompt": "真实的求助也需要一条安全路径。",
+          "choices": [
+            {
+              "id": "f1a_after_1",
+              "label": "通过医院入口支付并发送回执",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "善意准确抵达",
+              "feedback": "押金直接进入医院账户，阿杰拿着凭证去办手续。你既帮上了忙，也保护了双方。"
+            },
+            {
+              "id": "f1a_after_2",
+              "label": "仍转给阿杰，不索要缴费凭证",
+              "nextNode": "ending_unguarded",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "身份真不等于路径稳",
+              "feedback": "阿杰确实在医院，但私人转账让后续报销和追溯变得困难。你帮到了他，却少了一道凭证。"
+            },
+            {
+              "id": "f1a_after_3",
+              "label": "约定回执，事后一起复盘求助流程",
+              "nextNode": "ending_mixed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "谨慎成了共同习惯",
+              "feedback": "阿杰理解你的做法，还约定以后遇到急事先报医院名称、再走官方缴费。友谊多了一套共同规则。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -3832,6 +4426,16 @@
         "友谊经历考验，不同的选择导向不同的未来"
       ],
       "endings": {
+        "friend_repaired": {
+          "title": "坦白让友谊多了一条规则",
+          "body": "你们没有假装裂痕不存在，而是把下一次求助该怎样验证、怎样回应说清楚了。",
+          "tone": "best"
+        },
+        "friend_apology": {
+          "title": "道歉有效，边界仍要保留",
+          "body": "一句随时开口很温暖，但可靠的友谊还需要可执行的帮助方式和不伤人的核验。",
+          "tone": "mixed"
+        },
         "best": {
           "title": "善意和警惕并行",
           "body": "你既保护了钱也保护了友谊——验证没有伤害信任，反而让信任更结实。"
@@ -3879,7 +4483,7 @@
             {
               "id": "b1a",
               "label": "道谢后挂断，改拨卡背面客服号码回验",
-              "nextNode": "ending_good",
+              "nextNode": "b1a_after",
               "effects": {
                 "relationship": 0,
                 "evidence": 3,
@@ -3905,7 +4509,7 @@
             {
               "id": "b1c",
               "label": "问对方工号姓名，同时用另一部手机查这个座机",
-              "nextNode": "ending_good",
+              "nextNode": "b1c_after",
               "effects": {
                 "relationship": 0,
                 "evidence": 3,
@@ -3918,7 +4522,7 @@
             {
               "id": "b1d",
               "label": "既然对方准确说出了我的卡号和消费，配合他完成冻结",
-              "nextNode": "ending_unguarded",
+              "nextNode": "b1d_after",
               "effects": {
                 "relationship": 0,
                 "evidence": 0,
@@ -3986,12 +4590,12 @@
             {
               "id": "b3a",
               "label": "终于拨打银行客服电话，冻结卡片并报警",
-              "nextNode": "ending_estranged",
+              "nextNode": "ending_bank_dispute",
               "effects": {
                 "relationship": 0,
                 "evidence": 2,
                 "exposure": 0,
-                "loss": 28700
+                "loss": 8500
               },
               "feedbackTitle": "两万八千七百元——这是犹豫的账单",
               "feedback": "银行客服告诉你，前两笔交易已经入账，后两笔还在处理中。你的犹豫让骗子有充足的时间在你卡上画地图。银行会启动盗刷调查，但过程漫长。你看着账单回想——如果十五分钟前接起那个电话，损失可能是零。"
@@ -3999,7 +4603,7 @@
             {
               "id": "b3b",
               "label": "到最近的银行网点求助",
-              "nextNode": "ending_estranged",
+              "nextNode": "ending_bank_branch",
               "effects": {
                 "relationship": 0,
                 "evidence": 2,
@@ -4017,12 +4621,28 @@
                 "relationship": 0,
                 "evidence": 1,
                 "exposure": 0,
-                "loss": 0
+                "loss": 8500
               },
               "feedbackTitle": "境外盗刷追回率不足三成",
               "feedback": "你终于开始面对现实。但你的应对方式是独自搜索而非立即行动。时间在一分一秒地流逝——每一分钟都可能让追回的可能性降低。"
             }
           ]
+        },
+        {
+          "id": "ending_bank_dispute",
+          "endingKey": "bank_dispute",
+          "chapter": "结局·争议流程启动",
+          "scene": "你从卡背面的号码拨回银行，冻结卡片、取得工单号并报警。四笔交易中两笔已经入账，两笔仍在清算，银行把后两笔拦住，并对前两笔启动盗刷争议。两万八千七百元是账户曾经暴露的金额，不等于已经追回的钱；接下来每一份报警回执、行程证明和交易异议材料，都会决定最终损失。你没有抹掉迟疑的代价，但终于把处置放进了可追踪的正式流程。",
+          "prompt": "",
+          "choices": []
+        },
+        {
+          "id": "ending_bank_branch",
+          "endingKey": "bank_branch",
+          "chapter": "结局·柜台完成止损",
+          "scene": "你带着身份证和手机赶到网点。柜员当面核验身份、冻结卡片，并赶在清算前撤销了仍处于预授权状态的交易；已入账部分则登记为争议款。这个办法比官方回拨多耗了半小时，却没有把验证码、密码或控制权交给来电者。你也终于确认：最初那通被挂断的电话确实来自银行风控。警惕没有错，缺少的是一条由你主动发起的验证路径。",
+          "prompt": "",
+          "choices": []
         },
         {
           "id": "ending_good",
@@ -4051,6 +4671,147 @@
           "scene": "你经历了一些损失后才找对了方向。但至少你最终采取了行动而不是继续无视。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "b1a_after",
+          "chapter": "回拨银行之后",
+          "scene": "你从卡背面回拨，确认菲律宾交易确实被风控拦截。客服建议冻结卡片并提交争议材料，稍后发送官方回执。",
+          "prompt": "止住盗刷后，哪件事决定能否顺利收尾？",
+          "choices": [
+            {
+              "id": "b1a_after_1",
+              "label": "冻结卡片并提交争议材料",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "交易完整收尾",
+              "feedback": "银行留存回拨记录和争议材料，8200元最终从清算环节退回。"
+            },
+            {
+              "id": "b1a_after_2",
+              "label": "只冻结卡片，等账单出来再说",
+              "nextNode": "ending_mixed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "证据窗口变窄",
+              "feedback": "盗刷没有扩大，但你错过最方便提交材料的窗口，后续处理多了几轮往返。"
+            },
+            {
+              "id": "b1a_after_3",
+              "label": "不再查看短信和账单",
+              "nextNode": "ending_unguarded",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "拦截不等于永远安全",
+              "feedback": "原卡被停用，可你没有检查快捷支付，下一笔小额扣款直到月底才被发现。"
+            }
+          ]
+        },
+        {
+          "id": "b1c_after",
+          "chapter": "座机核验之后",
+          "scene": "官网号码、工号和最近三笔消费都对得上。银行请你确认是否换卡，并提醒检查自动扣款和第三方支付绑定。",
+          "prompt": "信息对上之后，你如何完成账户整理？",
+          "choices": [
+            {
+              "id": "b1c_after_1",
+              "label": "换卡并逐项检查自动扣款",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "核验落实到每个入口",
+              "feedback": "你更新订阅支付方式并保存银行工单，所有可能扣款的入口都被重新检查。"
+            },
+            {
+              "id": "b1c_after_2",
+              "label": "只接受冻结，不处理旧卡绑定",
+              "nextNode": "ending_mixed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "授权没有清干净",
+              "feedback": "大额盗刷被拦下，旧卡绑定的一项小额会员费却继续扣款。"
+            },
+            {
+              "id": "b1c_after_3",
+              "label": "转发未打码录音提醒家人",
+              "nextNode": "ending_unguarded",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "账户细节随提醒扩散",
+              "feedback": "家人学会回拨核验，但录音带着你的尾号和消费时间。分享前也要先处理隐私。"
+            }
+          ]
+        },
+        {
+          "id": "b1d_after",
+          "chapter": "配合冻结之后",
+          "scene": "你按来电指引完成冻结，随后收到一条短信，要求点击链接解除风控。你忽然想起银行不会让你用陌生链接恢复卡片。",
+          "prompt": "你已经配合过一次，怎样拿回主动权？",
+          "choices": [
+            {
+              "id": "b1d_after_1",
+              "label": "挂断并改拨卡背面客服确认工单",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "主动权回到手里",
+              "feedback": "回拨后银行确认卡已冻结，短信链接是仿冒页面。你补做核验，避开了第二道陷阱。"
+            },
+            {
+              "id": "b1d_after_2",
+              "label": "点击链接解除限制",
+              "nextNode": "ending_unguarded",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "方便按钮通向假页面",
+              "feedback": "页面要求卡号、验证码和身份证后四位。你在提交前退出，但字段已被页面记录。"
+            },
+            {
+              "id": "b1d_after_3",
+              "label": "转给家人讨论，不联系银行",
+              "nextNode": "ending_mixed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "讨论替代不了官方回拨",
+              "feedback": "家人意见不一，你们错过工单时间。卡最终换掉，争议材料却补交了好几次。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -4064,6 +4825,16 @@
         "追回难度与反应速度成正比"
       ],
       "endings": {
+        "bank_dispute": {
+          "title": "迟到，但进入了正式轨道",
+          "body": "你冻结卡片、报警并提交争议材料。真正的止损不是得到一句“会处理”，而是拿到工单、保存证据并持续追踪清算结果。",
+          "tone": "mixed"
+        },
+        "bank_branch": {
+          "title": "把验证搬到柜台",
+          "body": "线下核验更慢，却让身份、交易和处置都可追踪。最优解仍是及时官方回拨，但稳妥行动永远胜过原地怀疑。",
+          "tone": "mixed"
+        },
         "best": {
           "title": "正确验证",
           "body": "你用独立渠道验证了身份——零损失，卡片安全。"
@@ -4111,7 +4882,7 @@
             {
               "id": "v1a",
               "label": "称赞计划书的质量，约他线下见面聊聊项目细节",
-              "nextNode": "ending_good",
+              "nextNode": "v1a_after",
               "effects": {
                 "relationship": 2,
                 "evidence": 3,
@@ -4137,7 +4908,7 @@
             {
               "id": "v1c",
               "label": "直接问：这是不是又一个庞氏骗局",
-              "nextNode": "ending_estranged",
+              "nextNode": "v1c_after",
               "effects": {
                 "relationship": -3,
                 "evidence": 1,
@@ -4270,6 +5041,100 @@
           "scene": "你没有损失也没有收获。阿凯的项目成功了，你看着他走到今天。你为他高兴——但也为自己当时没有参与而感到一丝遗憾。安全感是有代价的，那个代价叫做错过。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "v1a_after",
+          "chapter": "线下见面之后",
+          "scene": "阿凯带来营业执照、场地合同和投资人联系方式。现金流预测甚至没有刻意淡化会员退费风险。",
+          "prompt": "材料可信不等于必须投资，你怎样决定？",
+          "choices": [
+            {
+              "id": "v1a_after_1",
+              "label": "律师审协议后按里程碑分期投资",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "信任也有退出机制",
+              "feedback": "律师补上回购、分红和亏损边界。你分期投入，合作框架也更清楚。"
+            },
+            {
+              "id": "v1a_after_2",
+              "label": "当场转五万，先锁住股份",
+              "nextNode": "ending_unguarded",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "熟人项目也需要合同",
+              "feedback": "你转钱却没有盖章协议，阿凯后来补签文件。项目是真的，你的权益却差点只停在聊天记录里。"
+            },
+            {
+              "id": "v1a_after_3",
+              "label": "暂不投资，但帮他联系场地方",
+              "nextNode": "ending_mixed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "拒绝资金不等于拒绝朋友",
+              "feedback": "你没有投入本金，却帮他对接更合适的场地。阿凯理解你的边界，友谊没有被投资绑架。"
+            }
+          ]
+        },
+        {
+          "id": "v1c_after",
+          "chapter": "指控之后",
+          "scene": "“庞氏骗局”四个字让阿凯沉默。他发来工商查询入口和项目流水，说愿意让你查，但不愿在没有事实前被贴标签。",
+          "prompt": "怎样把伤人的判断改成有边界的核验？",
+          "choices": [
+            {
+              "id": "v1c_after_1",
+              "label": "先道歉，再逐项核对登记和合同",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "质疑改成了问题",
+              "feedback": "公司、场地和供应商都真实存在。阿凯接受道歉，是否投资仍由你自己决定。"
+            },
+            {
+              "id": "v1c_after_2",
+              "label": "继续在公开群提醒大家远离",
+              "nextNode": "ending_estranged",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "无证据的警告伤害真人",
+              "feedback": "群里开始转发你的话，项目被迫暂停。后来证明没有违法，你们的关系却再难回到原处。"
+            },
+            {
+              "id": "v1c_after_3",
+              "label": "不再追问，也不解释",
+              "nextNode": "ending_mixed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "沉默留下礼貌距离",
+              "feedback": "你没损失钱，也没继续传播判断；阿凯把沉默理解成不信任，关系停在疏远的位置。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -4330,7 +5195,7 @@
             {
               "id": "e1a",
               "label": "拨打S市第一人民医院急诊科的电话核实",
-              "nextNode": "ending_good",
+              "nextNode": "e1a_after",
               "effects": {
                 "relationship": 1,
                 "evidence": 4,
@@ -4471,7 +5336,7 @@
             {
               "id": "e2a_1",
               "label": "表哥出院后当面道歉，说清是被AI诈骗案例吓到了",
-              "nextNode": "ending_mixed",
+              "nextNode": "ending_family_repaired",
               "effects": {
                 "relationship": 2,
                 "evidence": 1,
@@ -4484,7 +5349,7 @@
             {
               "id": "e2a_2",
               "label": "多付了表哥后续康复的一部分费用作为补偿",
-              "nextNode": "ending_mixed",
+              "nextNode": "ending_family_compensated",
               "effects": {
                 "relationship": 2,
                 "evidence": 0,
@@ -4508,6 +5373,22 @@
               "feedback": "你没有再提那通电话的事，但你开始更多地去表哥家坐坐、带水果、帮忙接孩子放学。表哥和表嫂感受到了你的改变。裂缝还在——但它被日常的温暖慢慢填上了。"
             }
           ]
+        },
+        {
+          "id": "ending_family_repaired",
+          "endingKey": "family_repaired",
+          "chapter": "结局·把误会说开",
+          "scene": "表哥出院后，你没有用一句“我也是为你好”替自己开脱，而是当面承认：核验本身没有错，但你把全部证明责任都压给了正在手术室外崩溃的表嫂。表哥接受了道歉。你们随后把医院总机、常住亲属和家庭暗号写进共享备忘录，约定紧急时由一人救急、一人独立核验。裂痕没有被假装成从未存在，却变成了下一次保护全家的规则。",
+          "prompt": "",
+          "choices": []
+        },
+        {
+          "id": "ending_family_compensated",
+          "endingKey": "family_compensated",
+          "chapter": "结局·钱替你说了半句话",
+          "scene": "你承担了三万元康复费用，表哥和表嫂知道这是歉意，也接受了你的责任感。但你始终没有谈起那通电话里最伤人的部分：当他们最需要家人时，你让他们先证明自己不是骗子。钱缓解了现实压力，却没有回答情感上的疑问。关系恢复了日常礼貌，只是下一次真正的紧急电话来临时，双方仍不知道该怎样既快速核验，又不让求助者独自承担恐惧。",
+          "prompt": "",
+          "choices": []
         },
         {
           "id": "ending_good",
@@ -4536,6 +5417,53 @@
           "scene": "你的怀疑伤了人，但你的真诚也部分地修复了伤害。信任在被划伤之后是可以愈合的——只是它会留下疤痕组织，那里的感觉会变得迟钝一点。",
           "prompt": "",
           "choices": []
+        },
+        {
+          "id": "e1a_after",
+          "chapter": "医院确认之后",
+          "scene": "急诊科确认表哥正在手术，医院官方页面显示五万元押金。表嫂赶到还要二十分钟，任何支付方式都能先救急。",
+          "prompt": "确认是真的之后，哪条付款路径最稳妥？",
+          "choices": [
+            {
+              "id": "e1a_after_1",
+              "label": "通过医院渠道支付并发送回执",
+              "nextNode": "ending_good",
+              "effects": {
+                "relationship": 0,
+                "evidence": 3,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "速度和安全同路",
+              "feedback": "押金直接进入医院账户，表嫂到窗口即可办理。验证没有变成拖延。"
+            },
+            {
+              "id": "e1a_after_2",
+              "label": "听从催促，转到表嫂个人账户",
+              "nextNode": "ending_unguarded",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 0,
+                "loss": 0
+              },
+              "feedbackTitle": "真实事件也需核对路径",
+              "feedback": "表哥确实在手术，但私人转账让后续报销和核对复杂。善意少了一层可追溯保护。"
+            },
+            {
+              "id": "e1a_after_3",
+              "label": "请社工和当地亲戚同步确认再付款",
+              "nextNode": "ending_mixed",
+              "effects": {
+                "relationship": 0,
+                "evidence": 1,
+                "exposure": 1,
+                "loss": 0
+              },
+              "feedbackTitle": "验证增加了距离",
+              "feedback": "社工确认流程，亲戚到场后你才付款。手术没被耽误，表嫂却在最慌乱时感到了距离。"
+            }
+          ]
         }
       ],
       "timeline": [
@@ -4548,6 +5476,16 @@
         "家庭关系因为处理方式的不同而走向不同的方向"
       ],
       "endings": {
+        "family_repaired": {
+          "title": "道歉变成了家庭规则",
+          "body": "你承认了方式造成的伤害，并和家人建立“先救急、同步核验”的协作方案。修复不是忘记裂痕，而是让裂痕产生新的保护。",
+          "tone": "best"
+        },
+        "family_compensated": {
+          "title": "补偿不能代替对话",
+          "body": "你承担了费用，却没有正面谈论不信任造成的伤害。责任被表达了一半，关系也只修复了一半。",
+          "tone": "mixed"
+        },
         "best": {
           "title": "验证与温度并行",
           "body": "你用了三分钟来验证，然后毫不犹豫地伸出了手。"

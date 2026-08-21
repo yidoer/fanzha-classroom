@@ -29,8 +29,8 @@ public final class StoryScript {
     public Ending ending(String key){JSONObject value=endings.optJSONObject(key);if(value==null)value=endings.optJSONObject("default");return new Ending(value==null?new JSONObject():value);}
 
     public static final class Node {
-        public final String id, chapter, scene, prompt; public final List<Choice> choices;
-        Node(JSONObject json){id=json.optString("id");chapter=json.optString("chapter");scene=json.optString("scene");prompt=json.optString("prompt","你准备怎么做？");choices=new ArrayList<>();JSONArray array=json.optJSONArray("choices");if(array!=null)for(int i=0;i<array.length();i++)choices.add(new Choice(array.optJSONObject(i)));}
+        public final String id, chapter, scene, prompt, endingKey; public final List<Choice> choices;
+        Node(JSONObject json){id=json.optString("id");chapter=json.optString("chapter");scene=json.optString("scene");prompt=json.optString("prompt","你准备怎么做？");endingKey=json.optString("endingKey");choices=new ArrayList<>();JSONArray array=json.optJSONArray("choices");if(array!=null)for(int i=0;i<array.length();i++)choices.add(new Choice(array.optJSONObject(i)));}
     }
 
     public static final class Choice {
@@ -39,7 +39,7 @@ public final class StoryScript {
     }
 
     public static final class Ending {
-        public final String title,body; Ending(JSONObject json){title=json.optString("title","故事结束");body=json.optString("body");}
+        public final String title,body,tone; Ending(JSONObject json){title=json.optString("title","故事结束");body=json.optString("body");tone=json.optString("tone");}
     }
 
     private static List<String> strings(JSONArray array){List<String> result=new ArrayList<>();if(array!=null)for(int i=0;i<array.length();i++)result.add(array.optString(i));return result;}

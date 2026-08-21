@@ -15,3 +15,7 @@ story-pack.sha256
 # Keep only curated release APKs under releases/, ignore all other build APKs
 *.apk
 !releases/*.apk
+
+# Cloudflare local installs and state
+cloudflare/node_modules/
+cloudflare/.wrangler/

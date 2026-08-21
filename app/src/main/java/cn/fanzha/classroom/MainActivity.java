@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -84,49 +83,54 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
     }
 
     private void showUpdateCenter() {
-        String message = "App 版本：" + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")" +
-                "\n剧情包：v" + StoryPackUpdater.currentVersion(this) +
-                "\n\n剧情更新会在应用内完成下载、SHA-256 校验、结构检查和原子替换。更新失败不会影响当前版本。";
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("更新中心")
-                .setMessage(message)
-                .setPositiveButton("检查剧情更新", null)
-                .setNeutralButton("检查 App 更新", null)
-                .setNegativeButton(StoryPackUpdater.canRollback(this) ? "回退剧情" : "关闭", null)
-                .create();
-        dialog.setOnShowListener(v -> {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(x -> { dialog.dismiss(); checkStoryUpdates(); });
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(x -> { dialog.dismiss(); checkAppUpdates(); });
-            if (StoryPackUpdater.canRollback(this)) dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(x -> {
-                dialog.dismiss();
-                StoryPackUpdater.rollback(this, result -> new AlertDialog.Builder(this).setTitle("剧情回退").setMessage(result.message).setPositiveButton("知道了", null).show());
-            });
-        });
-        dialog.show();
+        String message = "App 版本  " + BuildConfig.VERSION_NAME + "  ·  构建 " + BuildConfig.VERSION_CODE +
+                "\n剧情包版本  v" + StoryPackUpdater.currentVersion(this) +
+                "\n\n剧情包会在应用内完成下载、SHA-256 校验、结构检查与原子替换。任何一步失败，当前可用版本都会保留。";
+        List<WashiDialog.Action> actions = new ArrayList<>();
+        actions.add(WashiDialog.Action.asyncPrimary("检查剧情更新", this::checkStoryUpdates));
+        actions.add(WashiDialog.Action.asyncSecondary("检查 App 更新", this::checkAppUpdates));
+        if (StoryPackUpdater.canRollback(this)) {
+            actions.add(WashiDialog.Action.danger("回退到上一剧情版本", () ->
+                    StoryPackUpdater.rollback(this, result -> WashiDialog.message(
+                            this,
+                            "剧情回退",
+                            result.updated ? "已恢复上一版本" : "未做任何改动",
+                            result.message,
+                            true,
+                            WashiDialog.Action.primary("知道了", result.updated ? this::recreate : null)))));
+        }
+        actions.add(WashiDialog.Action.secondary("关闭", null));
+        WashiDialog.message(this, "更新中心", "应用与剧情维护", message, true,
+                actions.toArray(new WashiDialog.Action[0]));
     }
 
-    private void checkStoryUpdates() {
-        Button button = findViewById(R.id.checkUpdates);
-        button.setEnabled(false);
-        button.setContentDescription("正在检查更新");
+    private void checkStoryUpdates(WashiDialog.ActionHandle handle) {
         StoryPackUpdater.check(this, result -> {
-            button.setEnabled(true);
-            button.setContentDescription("更新中心");
-            new AlertDialog.Builder(this).setTitle(result.updated ? "更新完成" : "剧情更新")
-                    .setMessage(result.message).setPositiveButton("知道了", null).show();
-            if (result.updated) recreate();
+            handle.dismiss();
+            WashiDialog.message(this,
+                    result.updated ? "更新完成" : "剧情更新",
+                    result.updated ? "新剧情已通过完整性校验" : "当前剧情保持不变",
+                    result.message,
+                    true,
+                    WashiDialog.Action.primary(result.updated ? "载入新剧情" : "知道了",
+                            result.updated ? this::recreate : null));
         });
     }
 
-    private void checkAppUpdates() {
+    private void checkAppUpdates(WashiDialog.ActionHandle handle) {
         AppUpdateManager.check(this, result -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle("App 更新").setMessage(result.message).setNegativeButton("稍后", null);
-            if (result.updateAvailable) builder.setPositiveButton("在应用内下载", (d, w) -> AppUpdateManager.download(this, result));
-            else builder.setPositiveButton("知道了", null);
-            builder.show();
+            handle.dismiss();
+            if (result.updateAvailable) {
+                WashiDialog.message(this, "发现 App " + result.versionName, "来自 GitHub Releases",
+                        result.message, true,
+                        WashiDialog.Action.primary("下载并校验安装包", () -> AppUpdateManager.download(this, result)),
+                        WashiDialog.Action.secondary("稍后再说", null));
+            } else {
+                WashiDialog.message(this, "App 更新", "版本检查", result.message, true,
+                        WashiDialog.Action.primary("知道了", null));
+            }
         });
     }
-
     private void setupLibrary() {
         adapter = new CaseAdapter(this);
         caseList.setLayoutManager(new LinearLayoutManager(this));
@@ -303,16 +307,17 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
 
     /** 110 guidance stays inside the app; the player dials from their own keypad. */
     private void showEmergencyCallDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.emergency_call_title)
-                .setMessage(R.string.emergency_call_body)
-                .setPositiveButton("知道了", null)
-                .setNegativeButton(R.string.emergency_copy_number, (d, w) -> {
+        WashiDialog.message(this,
+                getString(R.string.emergency_call_title),
+                "止损指引 · 不会自动跳转拨号",
+                getString(R.string.emergency_call_body),
+                true,
+                WashiDialog.Action.primary("知道了", null),
+                WashiDialog.Action.secondary(getString(R.string.emergency_copy_number), () -> {
                     ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                     clipboard.setPrimaryClip(ClipData.newPlainText("110", "110"));
                     Toast.makeText(this, R.string.emergency_copied, Toast.LENGTH_SHORT).show();
-                })
-                .show();
+                }));
     }
 
     private void showInfo(String title, String subtitle) {
@@ -389,7 +394,11 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
 
     private void openUrl(String url) {
         try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); }
-        catch (Exception e) { new AlertDialog.Builder(this).setMessage("无法打开该链接").setPositiveButton("知道了", null).show(); }
+        catch (Exception e) {
+            WashiDialog.message(this, "链接未打开", "当前设备没有可用的处理应用",
+                    "你仍可稍后从更新中心重试。当前 App 和剧情不会受到影响。", true,
+                    WashiDialog.Action.primary("知道了", null));
+        }
     }
 
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }

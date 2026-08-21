@@ -43,7 +43,7 @@
             android:layout_marginTop="@dimen/space_3" android:layout_marginBottom="@dimen/space_3" android:textColor="@color/text_secondary" android:textSize="13sp" />
     </LinearLayout>
 
-    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+    <FrameLayout android:id="@+id/contentHost" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
         <androidx.recyclerview.widget.RecyclerView android:id="@+id/caseList"
             android:layout_width="match_parent" android:layout_height="match_parent"
             android:clipToPadding="false" android:paddingStart="@dimen/space_4" android:paddingEnd="@dimen/space_4"
@@ -52,18 +52,20 @@
             android:layout_gravity="center" android:gravity="center" android:lineSpacingMultiplier="1.4"
             android:padding="@dimen/space_5" android:textColor="@color/text_secondary" android:textSize="15sp"
             android:visibility="gone" />
+        <ScrollView android:id="@+id/infoScroll" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:background="@color/bg_page" android:clipToPadding="false" android:fillViewport="true"
+            android:scrollbars="none" android:visibility="gone">
+            <LinearLayout android:id="@+id/infoContent" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:paddingStart="@dimen/space_4"
+                android:paddingTop="@dimen/space_4" android:paddingEnd="@dimen/space_4"
+                android:paddingBottom="@dimen/space_5" />
+        </ScrollView>
     </FrameLayout>
-
-    <ScrollView android:id="@+id/infoScroll" android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:fillViewport="true" android:visibility="gone">
-        <LinearLayout android:id="@+id/infoContent" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="vertical" android:padding="@dimen/space_4" />
-    </ScrollView>
 
     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_subtle" />
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="@dimen/nav_bar_height" android:background="@color/surface_warm" android:elevation="6dp"
-        android:orientation="horizontal" android:paddingStart="@dimen/space_2" android:paddingEnd="@dimen/space_2" android:paddingTop="@dimen/space_1" android:paddingBottom="@dimen/space_1">
+        android:clipChildren="false" android:clipToPadding="false" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="@dimen/space_2" android:paddingEnd="@dimen/space_2" android:paddingTop="@dimen/space_1" android:paddingBottom="@dimen/space_1">
         <Button android:id="@+id/navCases" style="@style/NavButton" android:drawableTop="@drawable/ic_library" android:drawablePadding="3dp" android:text="@string/nav_stories" />
         <Button android:id="@+id/navFavorites" style="@style/NavButton" android:drawableTop="@drawable/ic_bookmark" android:drawablePadding="3dp" android:text="@string/nav_favorites" />
         <Button android:id="@+id/navEmergency" style="@style/NavButton" android:drawableTop="@drawable/ic_emergency" android:drawablePadding="3dp" android:text="@string/nav_emergency" />

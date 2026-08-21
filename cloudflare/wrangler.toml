@@ -3,7 +3,8 @@ main = "src/index.js"
 compatibility_date = "2026-08-01"
 
 [vars]
-GITHUB_MANIFEST_URL = "https://raw.githubusercontent.com/yidoer/fanzha-classroom/master/story-pack/manifest.json"
+GITHUB_MANIFEST_URL = "https://raw.githubusercontent.com/yidoer/fanzha-classroom/main/story-pack/manifest.json"
+GITHUB_REPOSITORY = "yidoer/fanzha-classroom"
 ALLOWED_ORIGIN = "*"
 
 [ai]

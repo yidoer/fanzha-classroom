@@ -3,6 +3,7 @@ on: [push, pull_request]
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -12,6 +13,8 @@ jobs:
         run: node tools/validate_story_pack.js
       - name: Validate interactive stories
         run: node tools/validate_interactive_stories.js
+      - name: Validate release manifest
+        run: node tools/validate_release_manifest.js
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -19,8 +22,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.12'
-      - name: Build debug APK
-        run: gradle :app:assembleDebug
+      - name: Build and lint debug APK
+        run: gradle :app:assembleDebug :app:lintDebug --no-daemon --console=plain
       - uses: actions/upload-artifact@v4
         with:
           name: app-debug

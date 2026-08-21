@@ -16,6 +16,33 @@ async function fetchWithRetry(url, init = {}, attempts = 4) {
   throw last || new Error('upstream unavailable');
 }
 
+function releaseAssetUrl(pathname, repository) {
+  const prefix = '/download/';
+  if (!pathname.startsWith(prefix)) return null;
+  let source;
+  try { source = new URL(decodeURIComponent(pathname.slice(prefix.length))); }
+  catch { return null; }
+  const expectedPrefix = '/' + repository + '/releases/download/';
+  if (source.protocol !== 'https:' || source.hostname !== 'github.com' || !source.pathname.startsWith(expectedPrefix)) return null;
+  return source.toString();
+}
+
+async function proxyReleaseAsset(request, source, cors) {
+  const headers = { accept: request.headers.get('accept') || '*/*' };
+  const range = request.headers.get('range');
+  if (range) headers.range = range;
+  try {
+    const upstream = await fetchWithRetry(source, { headers }, 3);
+    const responseHeaders = new Headers(upstream.headers);
+    responseHeaders.set('access-control-allow-origin', cors['access-control-allow-origin']);
+    responseHeaders.set('cache-control', 'public, max-age=3600');
+    responseHeaders.set('x-content-type-options', 'nosniff');
+    return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });
+  } catch {
+    return json({ error: 'release asset unavailable' }, 502, cors);
+  }
+}
+
 function compactContext(input) {
   return {
     schemaVersion: 1, storyId: String(input.storyId || '').slice(0, 80),
@@ -34,6 +61,8 @@ export default {
     const url = new URL(request.url);
     const cors = { 'access-control-allow-origin': env.ALLOWED_ORIGIN || '*' };
     if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
+    const releaseAsset = releaseAssetUrl(url.pathname, env.GITHUB_REPOSITORY || 'yidoer/fanzha-classroom');
+    if (releaseAsset && request.method === 'GET') return proxyReleaseAsset(request, releaseAsset, cors);
     if (url.pathname === '/manifest' && request.method === 'GET') {
       const cache = caches.default;
       const key = new Request(url.origin + '/manifest-cache');
@@ -57,6 +86,6 @@ export default {
       const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', { prompt, max_tokens: 3500 });
       return json({ candidate: result.response, context: input, warning: 'Human review and GitHub validation are required before release.' }, 200, cors);
     }
-    return json({ service: 'fanzha-story-edge', routes: ['/manifest', '/compact', '/draft'] }, 200, cors);
+    return json({ service: 'fanzha-story-edge', routes: ['/manifest', '/download/<github-release-url>', '/compact', '/draft'] }, 200, cors);
   }
 };
