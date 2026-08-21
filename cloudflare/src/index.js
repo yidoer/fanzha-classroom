@@ -64,19 +64,12 @@ export default {
     const releaseAsset = releaseAssetUrl(url.pathname, env.GITHUB_REPOSITORY || 'yidoer/fanzha-classroom');
     if (releaseAsset && request.method === 'GET') return proxyReleaseAsset(request, releaseAsset, cors);
     if (url.pathname === '/manifest' && request.method === 'GET') {
-      const cache = caches.default;
-      const key = new Request(url.origin + '/manifest-cache');
-      let response = await cache.match(key);
-      if (!response) {
-        try {
-          const upstream = await fetchWithRetry(env.GITHUB_MANIFEST_URL, { headers: { accept: 'application/json' } });
-          if (!upstream.ok) return json({ error: 'manifest unavailable' }, 502, cors);
-          const text = await upstream.text(); JSON.parse(text);
-          response = new Response(text, { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=300', ...cors } });
-          ctx.waitUntil(cache.put(key, response.clone()));
-        } catch { return json({ error: 'manifest unavailable' }, 502, cors); }
-      }
-      return response;
+      try {
+        const upstream = await fetchWithRetry(env.GITHUB_MANIFEST_URL, { headers: { accept: 'application/json' } });
+        if (!upstream.ok) return json({ error: 'manifest unavailable' }, 502, cors);
+        const text = await upstream.text(); JSON.parse(text);
+        return new Response(text, { headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...cors } });
+      } catch { return json({ error: 'manifest unavailable' }, 502, cors); }
     }
     if (url.pathname === '/compact' && request.method === 'POST') return json(compactContext(await request.json()), 200, cors);
     if (url.pathname === '/draft' && request.method === 'POST') {

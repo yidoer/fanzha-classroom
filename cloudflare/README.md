@@ -1,6 +1,6 @@
 # Cloudflare 无服务器边缘层
 
-Worker 是可选组件。静态剧情更新仍可由 App 直连 GitHub；Worker 提供清单缓存、有限重试、匿名上下文压缩和作者专用候选剧情生成。
+Worker 是可选组件。静态剧情更新仍可由 App 直连 GitHub；Worker 提供清单回源重试、Release 下载代理、匿名上下文压缩和作者专用候选剧情生成。
 
 1. 修改 `wrangler.toml` 中的 GitHub Raw 清单地址。
 2. 在 Cloudflare 控制台启用 Workers AI。
