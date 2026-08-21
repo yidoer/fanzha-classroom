@@ -8,8 +8,8 @@
   "latestAppVersionCode": 9,
   "latestAppVersionName": "0.7.2",
   "apkUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.2/fanzha-classroom-0.7.2-debug.apk",
-  "apkSha256": "939ee2531a02b4de7ded6a5a0c59fe2b6aea681549ce06dc2e902dda2cc2df4e",
-  "appChangelog": "0.7.2：信任蓝强调色 + 中性墨色正文，打破通篇深蓝观感；顶部标题下移避让状态栏、层级更清爽；底部导航加高留白更舒展；故事进度条改为“当前放大填充 / 已走实心 / 未达空心描边”的双重编码；案例卡增加分隔线与按压抬升动效。",
+  "apkSha256": "9da94f94e0b043f7b3b27e51c330ff84676927ee1d64934cc532e6cc98893c19",
+  "appChangelog": "0.7.2：和纸更新中心与止损指引；检查更新改为异步加载，检查期间保持当前页面；更新清单优先走 Cloudflare Worker 并自动回退 GitHub；多源下载与 SHA-256 校验。",
   "downloadUrls": [
     "https://fanzha-story-edge.yidoer.workers.dev/download/https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json",
     "https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json"
