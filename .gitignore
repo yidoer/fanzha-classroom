@@ -20,3 +20,9 @@ story-pack.sha256
 cloudflare/node_modules/
 cloudflare/.wrangler/
 cloudflare/.wrangler-config/
+
+# Local Android release signing material - keep an encrypted offline backup.
+signing/
+*.jks
+*.keystore
+keystore.properties

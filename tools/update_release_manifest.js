@@ -50,9 +50,10 @@ if (mode === 'stories') {
   if (!/^\d+\.\d+\.\d+$/.test(name)) throw new Error('APP_VERSION_NAME must use x.y.z');
   manifest.latestAppVersionCode = code;
   manifest.latestAppVersionName = name;
-  manifest.apkUrl = `https://github.com/${repository}/releases/download/app-v${name}/fanzha-classroom-${name}-debug.apk`;
+  manifest.apkUrl = `https://github.com/${repository}/releases/download/app-v${name}/fanzha-classroom-${name}.apk`;
   manifest.apkUrls = downloadUrls(manifest.apkUrl);
   manifest.apkSha256 = sha('APK_SHA256');
+  manifest.apkCertificateSha256 = sha('APK_CERTIFICATE_SHA256');
   manifest.appChangelog = text('RELEASE_CHANGELOG');
 } else {
   throw new Error('usage: node tools/update_release_manifest.js stories|apk');

@@ -1,5 +1,25 @@
 apply plugin: 'com.android.application'
 
+import java.util.Properties
+
+def localSigningProperties = new Properties()
+def localSigningFile = rootProject.file('signing/release.properties')
+if (localSigningFile.exists()) {
+    localSigningFile.withInputStream { localSigningProperties.load(it) }
+}
+def signingValue = { String name ->
+    def environmentValue = System.getenv(name)
+    if (environmentValue != null && !environmentValue.trim().isEmpty()) return environmentValue.trim()
+    def propertyValue = project.findProperty(name)
+    if (propertyValue != null && !propertyValue.toString().trim().isEmpty()) return propertyValue.toString().trim()
+    return localSigningProperties.getProperty(name, '').trim()
+}
+def releaseStoreFilePath = signingValue('RELEASE_STORE_FILE')
+def releaseStorePassword = signingValue('RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = signingValue('RELEASE_KEY_ALIAS')
+def releaseKeyPassword = signingValue('RELEASE_KEY_PASSWORD')
+def releaseSigningReady = [releaseStoreFilePath, releaseStorePassword, releaseKeyAlias, releaseKeyPassword].every { !it.isEmpty() }
+
 android {
     namespace 'cn.fanzha.classroom'
     compileSdk 35
@@ -8,12 +28,23 @@ android {
         applicationId 'cn.fanzha.classroom'
         minSdk 23
         targetSdk 35
-        versionCode 12
-        versionName '0.7.5'
+        versionCode 13
+        versionName '0.7.6'
         def storyManifestUrl = project.findProperty('STORY_MANIFEST_URL') ?: ''
         buildConfigField 'String', 'STORY_MANIFEST_URL', '"' + storyManifestUrl + '"'
         def storyFallbackUrl = project.findProperty('STORY_FALLBACK_MANIFEST_URL') ?: ''
         buildConfigField 'String', 'STORY_FALLBACK_MANIFEST_URL', '"' + storyFallbackUrl + '"'
+    }
+
+    signingConfigs {
+        release {
+            if (releaseSigningReady) {
+                storeFile rootProject.file(releaseStoreFilePath)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
     }
 
     buildFeatures {
@@ -24,6 +55,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (releaseSigningReady) signingConfig signingConfigs.release
         }
     }
 
@@ -33,9 +65,15 @@ android {
     }
 }
 
+gradle.taskGraph.whenReady { graph ->
+    boolean needsReleaseSigning = graph.allTasks.any { it.name.toLowerCase().contains('release') }
+    if (needsReleaseSigning && !releaseSigningReady) {
+        throw new GradleException('Release signing is required. Set RELEASE_STORE_FILE, RELEASE_STORE_PASSWORD, RELEASE_KEY_ALIAS, and RELEASE_KEY_PASSWORD.')
+    }
+}
+
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
 }
-

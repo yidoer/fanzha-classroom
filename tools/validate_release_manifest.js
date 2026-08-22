@@ -30,9 +30,14 @@ requireUrlList('downloadUrls', 'downloadUrl');
 requireUrlList('apkUrls', 'apkUrl');
 if (manifest.sha256 && !/^[0-9a-f]{64}$/.test(manifest.sha256)) errors.push('sha256 must be lowercase SHA-256');
 if (manifest.apkSha256 && !/^[0-9a-f]{64}$/.test(manifest.apkSha256)) errors.push('apkSha256 must be lowercase SHA-256');
+if (manifest.apkCertificateSha256 !== undefined && (typeof manifest.apkCertificateSha256 !== 'string' || !/^[0-9a-f]{64}$/.test(manifest.apkCertificateSha256))) errors.push('apkCertificateSha256 must be lowercase SHA-256 when present');
 if (manifest.latestAppVersionName && !/^\d+\.\d+\.\d+$/.test(manifest.latestAppVersionName)) errors.push('latestAppVersionName must use x.y.z');
 if (manifest.downloadUrl && !manifest.downloadUrl.includes(`/stories-v${manifest.packVersion}/story-pack.json`)) errors.push('downloadUrl does not match packVersion');
-if (manifest.apkUrl && !manifest.apkUrl.includes(`/app-v${manifest.latestAppVersionName}/fanzha-classroom-${manifest.latestAppVersionName}-debug.apk`)) errors.push('apkUrl does not match latestAppVersionName');
+if (manifest.apkUrl) {
+  const releaseApk = `/app-v${manifest.latestAppVersionName}/fanzha-classroom-${manifest.latestAppVersionName}.apk`;
+  const legacyDebugApk = `/app-v${manifest.latestAppVersionName}/fanzha-classroom-${manifest.latestAppVersionName}-debug.apk`;
+  if (!manifest.apkUrl.includes(releaseApk) && !manifest.apkUrl.includes(legacyDebugApk)) errors.push('apkUrl does not match latestAppVersionName');
+}
 
 if (errors.length) {
   console.error(errors.join('\n'));

@@ -11,7 +11,7 @@ $env:GRADLE_USER_HOME="C:\Users\34748\.gradle"
 .\gradlew.bat :app:assembleDebug --offline
 ```
 
-生成的安装包位于 `app/build/outputs/apk/debug/app-debug.apk`。
+本地调试包位于 `app/build/outputs/apk/debug/app-debug.apk`。可应用内更新的正式包由 GitHub Actions 以固定 release keystore 构建；配置方式见 `docs/android-release-signing.md`。
 
 ## 当前里程碑
 

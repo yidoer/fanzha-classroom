@@ -12,6 +12,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 final class UpdateDownloadClient {
+    interface DownloadProgressListener {
+        void onAttempt(int attempt, int totalAttempts);
+        void onProgress(long downloadedBytes, long totalBytes);
+    }
+
     private UpdateDownloadClient() {}
 
     static String[] sources(JSONObject manifest, String listKey, String legacyKey) {
@@ -25,6 +30,11 @@ final class UpdateDownloadClient {
     }
 
     static byte[] downloadWithFallback(String[] sources, int maxBytes, String accept) throws Exception {
+        return downloadWithFallback(sources, maxBytes, accept, null);
+    }
+
+    static byte[] downloadWithFallback(String[] sources, int maxBytes, String accept,
+                                       DownloadProgressListener listener) throws Exception {
         if (sources == null || sources.length == 0) throw new IllegalStateException("尚未配置更新地址");
         Exception last = null;
         List<String> usable = new ArrayList<>();
@@ -33,11 +43,15 @@ final class UpdateDownloadClient {
         }
         if (usable.isEmpty()) throw new IllegalStateException("更新地址必须使用 HTTPS");
 
+        int totalAttempts = usable.size() * 2;
+        int attempt = 0;
         // Two rounds let a temporarily busy mirror recover while still switching sources quickly.
         for (int round = 0; round < 2; round++) {
             for (String source : usable) {
+                attempt++;
+                if (listener != null) listener.onAttempt(attempt, totalAttempts);
                 try {
-                    return download(source, maxBytes, accept);
+                    return download(source, maxBytes, accept, listener);
                 } catch (Exception error) {
                     last = error;
                     Thread.sleep(350L * (round + 1) + (long) (Math.random() * 250));
@@ -58,22 +72,34 @@ final class UpdateDownloadClient {
         if (normalized.startsWith("https://")) values.add(normalized);
     }
 
-    private static byte[] download(String source, int maxBytes, String accept) throws Exception {
+    private static byte[] download(String source, int maxBytes, String accept,
+                                   DownloadProgressListener listener) throws Exception {
         HttpURLConnection connection = (HttpURLConnection) new URL(source).openConnection();
         connection.setConnectTimeout(8000);
         connection.setReadTimeout(30000);
         connection.setInstanceFollowRedirects(true);
         connection.setRequestProperty("Accept", accept);
+        connection.setRequestProperty("Accept-Encoding", "identity");
         connection.setRequestProperty("User-Agent", "FanZha-Classroom/" + BuildConfig.VERSION_NAME);
         int status = connection.getResponseCode();
         if (status < 200 || status >= 300) throw new IllegalStateException("HTTP " + status);
+        long totalBytes = connection.getContentLength();
+        if (totalBytes > maxBytes) throw new IllegalArgumentException("下载文件过大");
+        if (listener != null) listener.onProgress(0, totalBytes);
         try (InputStream input = connection.getInputStream(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[16384];
             int read;
+            long lastUpdateAt = 0;
             while ((read = input.read(buffer)) >= 0) {
                 output.write(buffer, 0, read);
                 if (output.size() > maxBytes) throw new IllegalArgumentException("下载文件过大");
+                long now = System.currentTimeMillis();
+                if (listener != null && (now - lastUpdateAt >= 120 || output.size() == totalBytes)) {
+                    listener.onProgress(output.size(), totalBytes);
+                    lastUpdateAt = now;
+                }
             }
+            if (listener != null) listener.onProgress(output.size(), totalBytes);
             return output.toByteArray();
         } finally {
             connection.disconnect();

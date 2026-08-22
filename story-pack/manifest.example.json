@@ -7,15 +7,16 @@
   "changelog": "新增真假混合长篇故事，并修订分支因果。",
   "latestAppVersionCode": 2,
   "latestAppVersionName": "0.2.0",
-  "apkUrl": "https://github.com/OWNER/REPOSITORY/releases/download/app-v0.2.0/fanzha-classroom-0.2.0-debug.apk",
+  "apkUrl": "https://github.com/OWNER/REPOSITORY/releases/download/app-v0.2.0/fanzha-classroom-0.2.0.apk",
   "apkSha256": "REPLACE_WITH_LOWERCASE_SHA256",
+  "apkCertificateSha256": "REPLACE_WITH_LOWERCASE_SHA256",
   "appChangelog": "新增应用内更新中心与剧情回退。",
   "downloadUrls": [
     "https://YOUR-WORKER.workers.dev/download/https://github.com/OWNER/REPOSITORY/releases/download/stories-v2/story-pack.json",
     "https://github.com/OWNER/REPOSITORY/releases/download/stories-v2/story-pack.json"
   ],
   "apkUrls": [
-    "https://YOUR-WORKER.workers.dev/download/https://github.com/OWNER/REPOSITORY/releases/download/app-v0.2.0/fanzha-classroom-0.2.0-debug.apk",
-    "https://github.com/OWNER/REPOSITORY/releases/download/app-v0.2.0/fanzha-classroom-0.2.0-debug.apk"
+    "https://YOUR-WORKER.workers.dev/download/https://github.com/OWNER/REPOSITORY/releases/download/app-v0.2.0/fanzha-classroom-0.2.0.apk",
+    "https://github.com/OWNER/REPOSITORY/releases/download/app-v0.2.0/fanzha-classroom-0.2.0.apk"
   ]
 }

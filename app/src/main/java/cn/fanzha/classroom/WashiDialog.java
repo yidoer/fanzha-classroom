@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 /** Shared paper-surface dialogs used by updates, story navigation, and guidance. */
 public final class WashiDialog {
@@ -118,18 +119,40 @@ public final class WashiDialog {
     public static final class ProgressHandle {
         private final Dialog dialog;
         private final TextView message;
+        private final LinearProgressIndicator indicator;
 
-        private ProgressHandle(Dialog dialog, TextView message) {
+        private ProgressHandle(Dialog dialog, TextView message, LinearProgressIndicator indicator) {
             this.dialog = dialog;
             this.message = message;
+            this.indicator = indicator;
         }
 
         public void setMessage(String value) {
-            message.setText(value);
+            message.post(() -> message.setText(value));
+        }
+
+        public void setIndeterminateMessage(String value) {
+            indicator.post(() -> indicator.setIndeterminate(true));
+            setMessage(value);
+        }
+
+        public void setDownloadProgress(long downloadedBytes, long totalBytes) {
+            final boolean hasTotal = totalBytes > 0;
+            final int progress = hasTotal ? (int) Math.min(1000L, downloadedBytes * 1000L / totalBytes) : 0;
+            indicator.post(() -> {
+                indicator.setIndeterminate(!hasTotal);
+                if (hasTotal) indicator.setProgressCompat(progress, true);
+            });
+            String text = hasTotal
+                    ? "已下载 " + readableBytes(downloadedBytes) + " / " + readableBytes(totalBytes) + "（" + (progress / 10) + "%）"
+                    : "已下载 " + readableBytes(downloadedBytes) + "，正在接收数据";
+            setMessage(text);
         }
 
         public void dismiss() {
-            if (dialog.isShowing()) dialog.dismiss();
+            message.post(() -> {
+                if (dialog.isShowing()) dialog.dismiss();
+            });
         }
     }
 
@@ -180,28 +203,29 @@ public final class WashiDialog {
     public static ProgressHandle progress(Context context, String title, String eyebrow, String message) {
         Dialog dialog = create(context, title, eyebrow, false);
         LinearLayout content = dialog.findViewById(R.id.washiDialogContent);
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setBackgroundResource(R.drawable.bg_dialog_note);
-        row.setPadding(dp(context, 14), dp(context, 14), dp(context, 14), dp(context, 14));
+        LinearLayout panel = new LinearLayout(context);
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setBackgroundResource(R.drawable.bg_dialog_note);
+        panel.setPadding(dp(context, 14), dp(context, 14), dp(context, 14), dp(context, 14));
 
-        CircularProgressIndicator indicator = new CircularProgressIndicator(context);
+        TextView body = body(context, message);
+        panel.addView(body, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        LinearProgressIndicator indicator = new LinearProgressIndicator(context);
         indicator.setIndeterminate(true);
         indicator.setIndicatorColor(color(context, R.color.brand));
         indicator.setTrackColor(color(context, R.color.border_subtle));
-        indicator.setIndicatorSize(dp(context, 30));
-        indicator.setTrackThickness(dp(context, 3));
-        row.addView(indicator, new LinearLayout.LayoutParams(dp(context, 40), dp(context, 40)));
+        indicator.setTrackCornerRadius(dp(context, 2));
+        indicator.setMax(1000);
+        LinearLayout.LayoutParams indicatorParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(context, 6));
+        indicatorParams.topMargin = dp(context, 14);
+        panel.addView(indicator, indicatorParams);
 
-        TextView body = body(context, message);
-        LinearLayout.LayoutParams bodyParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-        bodyParams.setMarginStart(dp(context, 12));
-        body.setLayoutParams(bodyParams);
-        row.addView(body);
-        content.addView(row);
+        content.addView(panel);
         showSized(context, dialog);
-        return new ProgressHandle(dialog, body);
+        return new ProgressHandle(dialog, body, indicator);
     }
 
     private static Dialog create(Context context, String title, String eyebrow, boolean cancelable) {
@@ -325,6 +349,10 @@ public final class WashiDialog {
         dialog.show();
     }
 
+    private static String readableBytes(long bytes) {
+        if (bytes < 1024L * 1024L) return Math.max(0, bytes / 1024L) + " KB";
+        return String.format(java.util.Locale.ROOT, "%.1f MB", bytes / (1024f * 1024f));
+    }
     private static int color(Context context, int resource) {
         return ContextCompat.getColor(context, resource);
     }

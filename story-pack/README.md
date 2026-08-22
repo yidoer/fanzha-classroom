@@ -9,7 +9,7 @@ App 与剧情包独立版本化。功能迭代使用 Android 的 `versionCode` /
 1. 将准备发布的改动合入 `main`，等待 `Validate and build` 通过。
 2. 发布剧情时运行 `Release story pack`，标签必须是严格递增的 `stories-vN`，填写更新说明和最低兼容 `versionCode`。
 3. 发布 APK 时先提升 `app/build.gradle` 的 `versionCode` / `versionName`，再运行 `Release APK`，输入必须与 `versionName` 完全一致。
-4. 工作流会校验剧情图、构建文件、Lint、版本与标签，生成 SHA-256，创建 GitHub Release，并把新的 `story-pack/manifest.json` 回写到 `main`。
+4. APK 工作流会从 GitHub Actions Secrets 恢复固定发布证书，校验剧情图、构建签名 APK、Lint、版本与标签，生成 APK/证书 SHA-256，创建 GitHub Release，并把新的 `story-pack/manifest.json` 回写到 `main`。首次配置和密钥备份见 `docs/android-release-signing.md`。
 5. APK 与剧情发布共用 `release-manifest` 并发锁，避免同时发布时互相覆盖清单字段。
 
 每次发布都会额外上传 `story-pack-manifest.json` 或 `app-release-manifest.json`。如果分支保护阻止机器人回写，可从 Actions artifact 下载该文件，核对后替换 `story-pack/manifest.json` 并提交。App 中“检查更新”读取清单；下载失败会以指数退避和随机抖动最多尝试四次，校验或结构检查失败时保留旧包。Release/资产发布与清单回写分为两个阶段：前者失败会使任务失败；若只有最后一次清单推送被分支保护拦截，任务会保留已发布结果，并在步骤摘要中给出人工恢复命令。剧情包工作流会在回写前清理本次构建生成的校验文件，因此不会因未跟踪文件的 Git 恢复操作而在 Release 已发布后失败。
@@ -29,7 +29,7 @@ App 与剧情包独立版本化。功能迭代使用 Android 的 `versionCode` /
 
 - 清单地址：`https://raw.githubusercontent.com/yidoer/fanzha-classroom/main/story-pack/manifest.json`
 - 剧情包地址：`https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json`
-- APK 地址由 `story-pack/manifest.json` 的 `apkUrl` 指向当前 Release。
+- APK 地址由 `story-pack/manifest.json` 的 `apkUrl` 指向当前固定签名 Release。
 
 本地发布前可运行：
 

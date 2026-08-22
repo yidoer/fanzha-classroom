@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version, must match app/build.gradle, such as 0.7.3"
+        description: "Release version, must match app/build.gradle, such as 0.7.6"
         required: true
       changelog:
         description: "User-facing update summary"
@@ -13,7 +13,7 @@ on:
         description: "Publish as a prerelease"
         required: true
         type: boolean
-        default: true
+        default: false
 
 permissions:
   contents: write
@@ -38,6 +38,26 @@ jobs:
           java-version: "17"
       - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
+      - name: Restore fixed Android signing key
+        env:
+          ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+          ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+          ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: |
+          for value in ANDROID_RELEASE_KEYSTORE_BASE64 ANDROID_RELEASE_STORE_PASSWORD ANDROID_RELEASE_KEY_ALIAS ANDROID_RELEASE_KEY_PASSWORD; do
+            test -n "${!value}" || { echo "Missing GitHub Actions secret: $value"; exit 1; }
+          done
+          KEYSTORE="$RUNNER_TEMP/fanzha-classroom-release.keystore"
+          printf '%s' "$ANDROID_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          test -s "$KEYSTORE"
+          keytool -list -keystore "$KEYSTORE" -storepass "$ANDROID_RELEASE_STORE_PASSWORD" -alias "$ANDROID_RELEASE_KEY_ALIAS" >/dev/null
+          {
+            echo "RELEASE_STORE_FILE=$KEYSTORE"
+            echo "RELEASE_STORE_PASSWORD=$ANDROID_RELEASE_STORE_PASSWORD"
+            echo "RELEASE_KEY_ALIAS=$ANDROID_RELEASE_KEY_ALIAS"
+            echo "RELEASE_KEY_PASSWORD=$ANDROID_RELEASE_KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
       - name: Check requested version
         env:
           REQUESTED_VERSION: ${{ inputs.version }}
@@ -75,8 +95,8 @@ jobs:
         run: |
           node tools/validate_story_pack.js app/src/main/assets/fraud_cases.json
           node tools/validate_interactive_stories.js app/src/main/assets/interactive_stories.json
-      - name: Build and lint APK
-        run: bash ./gradlew assembleDebug lintDebug --no-daemon --console=plain
+      - name: Build and lint signed release APK
+        run: bash ./gradlew assembleRelease lintRelease --no-daemon --console=plain
       - name: Prepare release assets
         env:
           RELEASE_VERSION: ${{ inputs.version }}
@@ -84,24 +104,28 @@ jobs:
           GITHUB_DOWNLOAD_PROXY: ${{ vars.GITHUB_DOWNLOAD_PROXY }}
         run: |
           mkdir -p releases
-          APK="releases/fanzha-classroom-$RELEASE_VERSION-debug.apk"
-          cp app/build/outputs/apk/debug/app-debug.apk "$APK"
+          APK="releases/fanzha-classroom-$RELEASE_VERSION.apk"
+          cp app/build/outputs/apk/release/app-release.apk "$APK"
           (cd releases && sha256sum "$(basename "$APK")" > "$(basename "$APK").sha256")
           test -s "$APK"
           (cd releases && sha256sum --check "$(basename "$APK").sha256")
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)
+          test -n "$APKSIGNER" || { echo "Unable to locate apksigner in Android build-tools"; exit 1; }
+          APK_CERTIFICATE_SHA256=$("$APKSIGNER" verify --print-certs "$APK" | awk -F': ' '/SHA-256 digest:/{gsub(":","",$2); print tolower($2); exit}')
+          test "$APK_CERTIFICATE_SHA256" =~ ^[0-9a-f]{64}$ || { echo "Unable to read APK signing certificate"; exit 1; }
           APP_VERSION_CODE=$(sed -n "s/.*versionCode[[:space:]]*\([0-9][0-9]*\).*/\1/p" app/build.gradle | head -n 1)
           APK_SHA256=$(cut -d ' ' -f 1 "$APK.sha256")
-          APP_VERSION_CODE="$APP_VERSION_CODE" APP_VERSION_NAME="$RELEASE_VERSION" APK_SHA256="$APK_SHA256" \
+          APP_VERSION_CODE="$APP_VERSION_CODE" APP_VERSION_NAME="$RELEASE_VERSION" APK_SHA256="$APK_SHA256" APK_CERTIFICATE_SHA256="$APK_CERTIFICATE_SHA256" \
             MANIFEST_SOURCE=current-release-manifest.json \
             MANIFEST_OUTPUT=app-release-manifest.json node tools/update_release_manifest.js apk
           node tools/validate_release_manifest.js app-release-manifest.json
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fanzha-classroom-${{ inputs.version }}-debug
+          name: fanzha-classroom-${{ inputs.version }}
           path: |
-            releases/fanzha-classroom-${{ inputs.version }}-debug.apk
-            releases/fanzha-classroom-${{ inputs.version }}-debug.apk.sha256
+            releases/fanzha-classroom-${{ inputs.version }}.apk
+            releases/fanzha-classroom-${{ inputs.version }}.apk.sha256
             app-release-manifest.json
           if-no-files-found: error
       - name: Publish GitHub release
@@ -112,14 +136,14 @@ jobs:
           prerelease: ${{ inputs.prerelease }}
           fail_on_unmatched_files: true
           body: |
-            反诈课堂 v${{ inputs.version }} Android 测试版。
+            反诈课堂 v${{ inputs.version }} Android 发布版。
 
             ${{ inputs.changelog }}
 
-            下载 APK 后可使用同名 `.sha256` 文件校验完整性。本版本发布前已通过剧情图校验、Android Lint 与 Debug APK 构建。
+            此 APK 使用固定发布证书签名。下载后可使用同名 `.sha256` 文件校验完整性；发布前已通过剧情图校验、Android Lint 与签名 APK 构建。
           files: |
-            releases/fanzha-classroom-${{ inputs.version }}-debug.apk
-            releases/fanzha-classroom-${{ inputs.version }}-debug.apk.sha256
+            releases/fanzha-classroom-${{ inputs.version }}.apk
+            releases/fanzha-classroom-${{ inputs.version }}.apk.sha256
             app-release-manifest.json
       - name: Publish update manifest to main
         run: |

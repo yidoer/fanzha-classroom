@@ -126,10 +126,17 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
         AppUpdateManager.check(this, result -> {
             handle.dismiss();
             if (result.updateAvailable) {
-                WashiDialog.message(this, "发现 App " + result.versionName, "来自 GitHub Releases",
-                        result.message, true,
-                        WashiDialog.Action.primary("下载并校验安装包", () -> AppUpdateManager.download(this, result)),
-                        WashiDialog.Action.secondary("稍后再说", null));
+                if (result.requiresReinstall) {
+                    WashiDialog.message(this, "需要一次迁移", "发布签名已升级",
+                            result.message, true,
+                            WashiDialog.Action.primary("打开发布页", () -> AppUpdateManager.openReleasePage(this, result.versionName)),
+                            WashiDialog.Action.secondary("稍后处理", null));
+                } else {
+                    WashiDialog.message(this, "发现 App " + result.versionName, "来自 GitHub Releases",
+                            result.message, true,
+                            WashiDialog.Action.primary("下载并校验安装包", () -> AppUpdateManager.download(this, result)),
+                            WashiDialog.Action.secondary("稍后再说", null));
+                }
             } else {
                 WashiDialog.message(this, "App 更新", "版本检查", result.message, true,
                         WashiDialog.Action.primary("知道了", null));
