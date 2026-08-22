@@ -5,17 +5,17 @@
   "downloadUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json",
   "sha256": "fc56e2f06154e706deb36945b0bc88df9a74ed31a8648ec823cfb427da5daeb7",
   "changelog": "互动剧情热更新：v0.7.0 后不再需要重新安装 APK 即可更新普通案例与多结局互动剧本。",
-  "latestAppVersionCode": 11,
-  "latestAppVersionName": "0.7.4",
-  "apkUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.4/fanzha-classroom-0.7.4-debug.apk",
-  "apkSha256": "601e2aea1971b95386fc966d20fa1fd201d46db4594a2d3af156826038de0e75",
-  "appChangelog": "0.7.4：更新下载失败提示改为安全、可重试的说明；Cloudflare 发布文件代理支持不可变边缘缓存，降低 GitHub 短暂波动导致的下载失败。",
+  "latestAppVersionCode": 12,
+  "latestAppVersionName": "0.7.5",
+  "apkUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.5/fanzha-classroom-0.7.5-debug.apk",
+  "apkSha256": "4444e123e737a0bfac5b76d135d4fefa852a87cbfc12bf280d328638ec8aadde",
+  "appChangelog": "优化故事库筛选与收藏页布局；新增居中悬浮的和纸液态玻璃导航栏，减少内容遮挡。",
   "downloadUrls": [
     "https://fanzha-story-edge.yidoer.workers.dev/download/https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json",
     "https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json"
   ],
   "apkUrls": [
-    "https://fanzha-story-edge.yidoer.workers.dev/download/https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.4/fanzha-classroom-0.7.4-debug.apk",
-    "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.4/fanzha-classroom-0.7.4-debug.apk"
+    "https://fanzha-story-edge.yidoer.workers.dev/download/https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.5/fanzha-classroom-0.7.5-debug.apk",
+    "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.5/fanzha-classroom-0.7.5-debug.apk"
   ]
 }
