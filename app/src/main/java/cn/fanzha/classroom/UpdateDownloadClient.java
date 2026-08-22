@@ -47,6 +47,12 @@ final class UpdateDownloadClient {
         throw last == null ? new IllegalStateException("下载失败") : last;
     }
 
+    static String describeFailure(Exception error) {
+        if (error instanceof SecurityException) return "下载文件未通过完整性校验，已被安全丢弃";
+        if (error instanceof IllegalArgumentException) return "下载文件大小异常，已停止本次下载";
+        return "暂时无法稳定连接更新服务";
+    }
+
     private static void addHttps(LinkedHashSet<String> values, String value) {
         String normalized = value == null ? "" : value.trim();
         if (normalized.startsWith("https://")) values.add(normalized);

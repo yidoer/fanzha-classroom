@@ -2,6 +2,8 @@ const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(b
   status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers }
 });
 
+const RELEASE_CACHE_SECONDS = 7 * 24 * 60 * 60;
+
 async function fetchWithRetry(url, init = {}, attempts = 4) {
   let last;
   for (let i = 0; i < attempts; i++) {
@@ -27,17 +29,33 @@ function releaseAssetUrl(pathname, repository) {
   return source.toString();
 }
 
-async function proxyReleaseAsset(request, source, cors) {
+function releaseResponse(response, cors, source) {
+  const headers = new Headers(response.headers);
+  headers.set('access-control-allow-origin', cors['access-control-allow-origin']);
+  headers.set('cache-control', `public, max-age=${RELEASE_CACHE_SECONDS}, immutable`);
+  headers.set('x-content-type-options', 'nosniff');
+  headers.set('x-update-source', source);
+  return new Response(response.body, { status: response.status, headers });
+}
+
+async function proxyReleaseAsset(request, source, cors, ctx) {
   const headers = { accept: request.headers.get('accept') || '*/*' };
   const range = request.headers.get('range');
   if (range) headers.range = range;
   try {
-    const upstream = await fetchWithRetry(source, { headers }, 3);
-    const responseHeaders = new Headers(upstream.headers);
-    responseHeaders.set('access-control-allow-origin', cors['access-control-allow-origin']);
-    responseHeaders.set('cache-control', 'public, max-age=3600');
-    responseHeaders.set('x-content-type-options', 'nosniff');
-    return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });
+    // Tagged GitHub releases are immutable, so a warm cache absorbs short source outages.
+    const cacheKey = new Request(new URL(request.url).toString(), { method: 'GET' });
+    if (request.method === 'GET' && !range) {
+      const cached = await caches.default.match(cacheKey);
+      if (cached) return releaseResponse(cached, cors, 'edge-cache');
+    }
+
+    const upstream = await fetchWithRetry(source, { method: request.method, headers }, 3);
+    const response = releaseResponse(upstream, cors, 'github-release');
+    if (request.method === 'GET' && !range && upstream.status === 200) {
+      ctx.waitUntil(caches.default.put(cacheKey, response.clone()).catch(() => {}));
+    }
+    return response;
   } catch {
     return json({ error: 'release asset unavailable' }, 502, cors);
   }
@@ -62,7 +80,9 @@ export default {
     const cors = { 'access-control-allow-origin': env.ALLOWED_ORIGIN || '*' };
     if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
     const releaseAsset = releaseAssetUrl(url.pathname, env.GITHUB_REPOSITORY || 'yidoer/fanzha-classroom');
-    if (releaseAsset && request.method === 'GET') return proxyReleaseAsset(request, releaseAsset, cors);
+    if (releaseAsset && (request.method === 'GET' || request.method === 'HEAD')) {
+      return proxyReleaseAsset(request, releaseAsset, cors, ctx);
+    }
     if (url.pathname === '/manifest' && request.method === 'GET') {
       try {
         const upstream = await fetchWithRetry(env.GITHUB_MANIFEST_URL, { headers: { accept: 'application/json' } });

@@ -12,7 +12,7 @@ Worker 是可选组件。静态剧情更新仍可由 App 直连 GitHub；Worker 
 
 ## GitHub Release 下载加速
 
-Worker 还提供受限的 `/download/<GitHub Release URL>` 路由，只允许代理 `GITHUB_REPOSITORY` 指定仓库的 Release 文件，不会成为任意网址的开放代理。部署后在 GitHub 仓库的 Actions variables 中新增：
+Worker 还提供受限的 `/download/<GitHub Release URL>` 路由，只允许代理 `GITHUB_REPOSITORY` 指定仓库的 Release 文件，不会成为任意网址的开放代理。已成功读取的标签 Release 会在边缘缓存 7 天；GitHub 出现短暂波动时，客户端仍可直接获得这份不可变的缓存副本。部署后在 GitHub 仓库的 Actions variables 中新增：
 
 `GITHUB_DOWNLOAD_PROXY=https://<worker-domain>/download/`
 

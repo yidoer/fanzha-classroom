@@ -19,3 +19,4 @@ story-pack.sha256
 # Cloudflare local installs and state
 cloudflare/node_modules/
 cloudflare/.wrangler/
+cloudflare/.wrangler-config/

@@ -45,19 +45,20 @@ public final class AppUpdateManager {
         WashiDialog.ProgressHandle progress=WashiDialog.progress(context,"下载 App "+release.versionName,
                 "加速节点 + GitHub Releases","正在尝试可用下载源。下载完成后会先核对 SHA-256，再交给系统安装器。");
         EXECUTOR.execute(() -> {
-            File apk=null; String error=null;
+            File apk=null; String failure=null;
             try {
                 byte[] bytes=UpdateDownloadClient.downloadWithFallback(release.apkUrls,150*1024*1024,"application/vnd.android.package-archive, application/octet-stream");
                 if(!sha256(bytes).equals(release.apkSha256.toLowerCase(Locale.ROOT)))throw new SecurityException("APK 校验失败");
                 File dir=new File(context.getFilesDir(),"updates");if(!dir.exists()&&!dir.mkdirs())throw new IllegalStateException("无法创建更新目录");
                 apk=new File(dir,"fanzha-"+release.versionName+".apk");try(FileOutputStream out=new FileOutputStream(apk)){out.write(bytes);out.getFD().sync();}
-            }catch(Exception e){error=e.getMessage()==null?"下载或校验失败":e.getMessage();}
-            File finalApk=apk;String finalError=error;new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+            }catch(Exception e){failure=UpdateDownloadClient.describeFailure(e);}
+            File finalApk=apk;String finalFailure=failure;new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
                 progress.dismiss();
                 if(finalApk==null){
-                    WashiDialog.message(context,"下载未完成","当前版本保持可用",
-                            finalError+"。已完成自动重试，你可以稍后回到更新中心再次尝试。",true,
-                            WashiDialog.Action.primary("知道了",null));
+                    WashiDialog.message(context,"下载暂未完成","已保护当前可用版本",
+                            finalFailure+"。\n\n已依次尝试加速节点和备用源。未通过校验的文件不会安装；检查网络后可直接再次尝试。",true,
+                            WashiDialog.Action.primary("再次尝试",() -> download(context,release)),
+                            WashiDialog.Action.secondary("暂不更新",null));
                 }else{
                     try{launchInstaller(context,finalApk);}
                     catch(Exception e){
