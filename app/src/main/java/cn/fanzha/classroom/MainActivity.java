@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -35,14 +34,17 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
     private CaseAdapter adapter;
     private EditText searchInput;
     private ImageButton clearSearch;
+    private View filterContent;
+    private MaterialButton filterToggle;
     private LinearLayout controls, categories, infoContent;
     private RecyclerView caseList;
     private ScrollView infoScroll;
     private TextView count, headerTitle, headerSubtitle, emptyView;
-    private Button navCases, navFavorites, navEmergency;
+    private MaterialButton navCases, navFavorites, navEmergency;
     private final java.util.LinkedHashMap<String, MaterialButton> categoryChips = new java.util.LinkedHashMap<>();
     private String selectedCategory = "全部";
     private boolean favoritesOnly;
+    private boolean filtersExpanded;
     private String activeNav = "stories";
     private SharedPreferences preferences;
 
@@ -65,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
             searchInput.requestFocus();
         });
         controls = findViewById(R.id.libraryControls);
+        filterContent = findViewById(R.id.filterContent);
+        filterToggle = findViewById(R.id.filterToggle);
+        filterToggle.setOnClickListener(v -> setFiltersExpanded(!filtersExpanded));
         categories = findViewById(R.id.categoryContainer);
         caseList = findViewById(R.id.caseList);
         infoScroll = findViewById(R.id.infoScroll);
@@ -190,6 +195,8 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
         favoritesOnly = onlyFavorites;
         activeNav = onlyFavorites ? "favorites" : "stories";
         controls.setVisibility(View.VISIBLE);
+        filterToggle.setVisibility(onlyFavorites ? View.GONE : View.VISIBLE);
+        setFiltersExpanded(!onlyFavorites && filtersExpanded);
         caseList.setVisibility(View.VISIBLE);
         infoScroll.setVisibility(View.GONE);
         headerTitle.setText(onlyFavorites ? "我的收藏" : "防诈课堂");
@@ -198,18 +205,61 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
         filterCases();
     }
 
+    private void setFiltersExpanded(boolean expanded) {
+        filtersExpanded = expanded;
+        boolean shouldShow = !favoritesOnly && expanded;
+        caseList.setPadding(
+                caseList.getPaddingLeft(),
+                px(shouldShow ? R.dimen.library_filter_expanded_inset : R.dimen.library_overlay_inset),
+                caseList.getPaddingRight(),
+                caseList.getPaddingBottom());
+        filterContent.animate().cancel();
+        if (shouldShow) {
+            filterContent.setAlpha(0f);
+            filterContent.setVisibility(View.VISIBLE);
+            filterContent.animate().alpha(1f).setDuration(180).start();
+        } else if (filterContent.getVisibility() == View.VISIBLE) {
+            filterContent.animate().alpha(0f).setDuration(150).withEndAction(() -> {
+                if (!filtersExpanded || favoritesOnly) {
+                    filterContent.setVisibility(View.GONE);
+                    filterContent.setAlpha(1f);
+                }
+            }).start();
+        } else {
+            filterContent.setVisibility(View.GONE);
+            filterContent.setAlpha(1f);
+        }
+        updateFilterToggle();
+    }
+
+    private void updateFilterToggle() {
+        int activeFilters = 0;
+        if (!searchInput.getText().toString().trim().isEmpty()) activeFilters++;
+        if (!"全部".equals(selectedCategory)) activeFilters++;
+        if (filtersExpanded) {
+            filterToggle.setText(R.string.filter_collapse);
+            filterToggle.setContentDescription(getString(R.string.filter_collapse));
+        } else if (activeFilters > 0) {
+            filterToggle.setText(getString(R.string.filter_active_fmt, activeFilters));
+            filterToggle.setContentDescription(getString(R.string.filter_expand));
+        } else {
+            filterToggle.setText(R.string.filter_label);
+            filterToggle.setContentDescription(getString(R.string.filter_expand));
+        }
+    }
     private void filterCases() {
         String query = searchInput.getText().toString().trim().toLowerCase(Locale.ROOT);
         List<FraudCase> filtered = new ArrayList<>();
         for (FraudCase item : allCases) {
             if (favoritesOnly && !favorites.contains(item.id)) continue;
-            if (!"全部".equals(selectedCategory) && !selectedCategory.equals(item.publicShelf())) continue;
-            if (!query.isEmpty() && !item.searchableText().contains(query)) continue;
+            if (!favoritesOnly && !"全部".equals(selectedCategory) && !selectedCategory.equals(item.publicShelf())) continue;
+            if (!favoritesOnly && !query.isEmpty() && !item.searchableText().contains(query)) continue;
             filtered.add(item);
         }
         adapter.submit(filtered);
         count.setText(buildCountText(filtered));
         updateEmptyState(filtered, query);
+        updateFilterToggle();
     }
 
     private void updateEmptyState(List<FraudCase> filtered, String query) {
@@ -234,9 +284,9 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
         return filtered.size() + " 篇互动故事 · 共 " + endings + " 种结局 · 已解锁 " + unlocked + " 种";
     }
 
-    /** The active tab gets brand tint + bold so the current page is never ambiguous. */
+    /** The selected destination gets a small tinted capsule inside the floating dock. */
     private void paintNav() {
-        Button[] buttons = { navCases, navFavorites, navEmergency };
+        MaterialButton[] buttons = { navCases, navFavorites, navEmergency };
         String[] keys = { "stories", "favorites", "emergency" };
         int activeColor = c(R.color.brand);
         int idleColor = c(R.color.text_secondary);
@@ -244,13 +294,10 @@ public class MainActivity extends AppCompatActivity implements CaseAdapter.Liste
             boolean active = keys[i].equals(activeNav);
             buttons[i].setBackgroundResource(active ? R.drawable.bg_nav_active : R.drawable.bg_nav_item);
             buttons[i].setBackgroundTintList(null);
-            buttons[i].setTextColor(active ? activeColor : idleColor);
-            buttons[i].setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
-            android.graphics.drawable.Drawable icon = buttons[i].getCompoundDrawables()[1];
-            if (icon != null) icon.mutate().setTint(active ? activeColor : idleColor);
+            buttons[i].setIconTint(android.content.res.ColorStateList.valueOf(active ? activeColor : idleColor));
+            buttons[i].setSelected(active);
         }
     }
-
     private void startStory(FraudCase item) {
         Intent intent = new Intent(this, StoryActivity.class);
         intent.putExtra("case_id", item.id);

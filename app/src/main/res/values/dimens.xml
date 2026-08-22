@@ -7,9 +7,15 @@
 
     <dimen name="radius_card">14dp</dimen>
     <dimen name="radius_chip">20dp</dimen>
+    <dimen name="radius_dock">28dp</dimen>
 
     <dimen name="touch_min">48dp</dimen>
     <dimen name="nav_bar_height">68dp</dimen>
+    <dimen name="nav_dock_width">272dp</dimen>
+    <dimen name="nav_dock_height">56dp</dimen>
     <dimen name="header_height">62dp</dimen>
     <dimen name="search_height">48dp</dimen>
+    <dimen name="library_overlay_inset">56dp</dimen>
+    <dimen name="library_filter_expanded_inset">164dp</dimen>
+    <dimen name="content_bottom_inset">88dp</dimen>
 </resources>
