@@ -5,17 +5,17 @@
   "downloadUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json",
   "sha256": "fc56e2f06154e706deb36945b0bc88df9a74ed31a8648ec823cfb427da5daeb7",
   "changelog": "互动剧情热更新：v0.7.0 后不再需要重新安装 APK 即可更新普通案例与多结局互动剧本。",
-  "latestAppVersionCode": 9,
-  "latestAppVersionName": "0.7.2",
-  "apkUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.2/fanzha-classroom-0.7.2-debug.apk",
-  "apkSha256": "9da94f94e0b043f7b3b27e51c330ff84676927ee1d64934cc532e6cc98893c19",
-  "appChangelog": "0.7.2：和纸更新中心与止损指引；检查更新改为异步加载，检查期间保持当前页面；更新清单优先走 Cloudflare Worker 并自动回退 GitHub；多源下载与 SHA-256 校验。",
+  "latestAppVersionCode": 10,
+  "latestAppVersionName": "0.7.3",
+  "apkUrl": "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.3/fanzha-classroom-0.7.3-debug.apk",
+  "apkSha256": "fe5b600c5edf5847f174dfe9258358fc8122b2504b6fe9302c1048960e41f601",
+  "appChangelog": "0.7.3: 重新验证 GitHub Release、更新清单回写与 Cloudflare 更新回源链路；无功能变化。",
   "downloadUrls": [
     "https://fanzha-story-edge.yidoer.workers.dev/download/https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json",
     "https://github.com/yidoer/fanzha-classroom/releases/download/stories-v3/story-pack.json"
   ],
   "apkUrls": [
-    "https://fanzha-story-edge.yidoer.workers.dev/download/https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.2/fanzha-classroom-0.7.2-debug.apk",
-    "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.2/fanzha-classroom-0.7.2-debug.apk"
+    "https://fanzha-story-edge.yidoer.workers.dev/download/https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.3/fanzha-classroom-0.7.3-debug.apk",
+    "https://github.com/yidoer/fanzha-classroom/releases/download/app-v0.7.3/fanzha-classroom-0.7.3-debug.apk"
   ]
 }
